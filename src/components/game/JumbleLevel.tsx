@@ -39,13 +39,16 @@ import { OutOfHeartsModal } from './OutOfHeartsModal';
 import { WinModal } from './WinModal';
 import { GameOverModal } from './GameOverModal';
 import { AudioButton } from '../ui/AudioButton';
+import { ConceptIntroWalkthrough } from './ConceptIntroWalkthrough';
+import { GRAMMAR_MODULES } from '../../data/grammarModules';
 
-import type { Question, CEFRLevel, HeartsState, WordItem } from '../../types';
+import type { Question, CEFRLevel, HeartsState, WordItem, ConceptIntro } from '../../types';
 
 interface JumbleLevelProps {
   questions: Question[];
   lessonName: string;
   cefrLevel?: CEFRLevel;
+  conceptIntro?: ConceptIntro;
   onComplete?: (stars: number, score: number) => void;
   onExit?: () => void;
 }
@@ -54,6 +57,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   questions: initialQuestions,
   lessonName,
   cefrLevel,
+  conceptIntro: propConceptIntro,
   onComplete: _onComplete,
   onExit,
 }) => {
@@ -65,6 +69,12 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   const [heartsState, setHeartsState] = React.useState<HeartsState>(() => getHeartsState());
   const [activeItem, setActiveItem] = React.useState<WordItem | null>(null);
   const [shaking, setShaking] = React.useState(false);
+  const [showRefillModal, setShowRefillModal] = React.useState(false);
+
+  // Find concept intro from props or module pool
+  const activeModule = GRAMMAR_MODULES.find(m => m.id === initialQuestions[0]?.lesson_id);
+  const conceptIntro = propConceptIntro || activeModule?.conceptIntro;
+  const [showIntro, setShowIntro] = React.useState<boolean>(() => !!conceptIntro);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -170,27 +180,30 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   // Save progress when completed
   useEffect(() => {
     if (state.phase === 'COMPLETED') {
-      const starResult = calculateStars(heartsState.heartsCount);
+      const starResult = calculateStars(state.mistakesCount, state.questions.length);
       fireWin();
       saveProgress('demo-user', currentQ?.lesson_id || 'lesson-1', starResult.stars);
       addUserPoints('demo-user', state.score, starResult.stars);
     }
-  }, [state.phase, heartsState.heartsCount, state.score, currentQ?.lesson_id, fireWin]);
+  }, [state.phase, state.mistakesCount, state.questions.length, state.score, currentQ?.lesson_id, fireWin]);
 
   // Out of hearts modal triggers
   const handleStartReviewMode = () => {
+    setShowRefillModal(false);
     actions.startReviewSession();
   };
 
   const handleRefillAll = () => {
     const fresh = refillAllHearts();
     setHeartsState(fresh);
+    setShowRefillModal(false);
     actions.refillHearts();
   };
 
   const handleUpgradeToPro = () => {
     const fresh = setProUserStatus(true);
     setHeartsState(fresh);
+    setShowRefillModal(false);
     actions.refillHearts();
   };
 
@@ -222,7 +235,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   }
 
   const isJumble = !currentQ.type || currentQ.type === 'jumble';
-  const starResult = calculateStars(heartsState.heartsCount);
+  const starResult = calculateStars(state.mistakesCount, state.questions.length);
   const promptText = lang === 'id' && currentQ.prompt_id ? currentQ.prompt_id : currentQ.prompt;
 
   return (
@@ -233,6 +246,17 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
+      {/* Brilliant.org Interactive Concept Walkthrough */}
+      {showIntro && conceptIntro && (
+        <ConceptIntroWalkthrough
+          conceptIntro={conceptIntro}
+          lessonTitle={lessonName}
+          cefrLevel={cefrLevel}
+          onStartChallenge={() => setShowIntro(false)}
+          onSkip={() => setShowIntro(false)}
+        />
+      )}
+
       <div className="bg-jumble min-h-dvh flex flex-col font-nunito relative">
         {/* Card Header */}
         <CardHeader
@@ -243,6 +267,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
           heartsCount={heartsState.heartsCount}
           isProUser={heartsState.isProUser}
           onExit={onExit}
+          onOpenRefillModal={() => setShowRefillModal(true)}
         />
 
         {/* Main Content Area */}
@@ -354,14 +379,18 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
           onContinue={handleContinue}
         />
 
-        {/* Out-of-Hearts Modal */}
+        {/* Out-of-Hearts / Voluntary Refill Modal */}
         <AnimatePresence>
-          {state.phase === 'OUT_OF_HEARTS' && (
+          {(state.phase === 'OUT_OF_HEARTS' || showRefillModal) && (
             <OutOfHeartsModal
+              heartsCount={heartsState.heartsCount}
               onStartReview={handleStartReviewMode}
               onRefillHearts={handleRefillAll}
               onUpgradePro={handleUpgradeToPro}
-              onClose={() => actions.refillHearts()}
+              onClose={() => {
+                setShowRefillModal(false);
+                actions.refillHearts();
+              }}
             />
           )}
         </AnimatePresence>
