@@ -1,73 +1,81 @@
-# React + TypeScript + Vite
+# Jumble 🧩
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Jumble** is a modern, high-performance, gamified English grammar learning web application built by **Menako Studio**. Inspired by interactive card-based learning mechanisms like Brilliant.org and Duolingo, Jumble helps non-native English speakers master English grammar from **CEFR levels A1 to B2** through interactive word jumbles, multiple choice, and fill-in-the-blank questions.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Key Features
 
-## React Compiler
+- **Interactive Question Types**:
+  - **Word Jumble**: Drag-and-drop or tap-to-select word tiles powered by `@dnd-kit`.
+  - **Multiple Choice**: Sleek visual selection cards.
+  - **Fill in the Blank**: Sentence completion tasks with real-time feedback.
+- **Structured CEFR Curriculum**:
+  - Modules categorized across CEFR levels A1, A2, B1, and B2.
+  - Covered categories: Tenses, Verbs & Modals, Nouns & Pronouns, Adjectives & Adverbs, Clauses & Conditionals, and Passive/Reported Speech.
+- **Gamification & Hearts Engine**:
+  - Heart counter (max 5) with automated passive recovery (1 heart / 4 hours).
+  - Out-of-Hearts Review Mode: Infinite practice pool to recover hearts.
+  - XP multiplier combo streaks and celebratory confetti visual FX.
+- **Zero-Cost Native Text-to-Speech (TTS)**:
+  - Integrated audio playback using browser-native Web Speech API.
+- **Offline-First & Resilient Data Layer**:
+  - Immediate `localStorage` progress persistence with background Supabase cloud sync queue.
+- **Bilingual Localization (i18n)**:
+  - 2-way instant toggle between English (`EN`) and Indonesian (`ID`).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: React 19, TypeScript, Vite 8, React Router DOM v7
+- **Styling & UI**: Tailwind CSS v3, Framer Motion, Lucide React, Canvas Confetti
+- **Drag & Drop**: `@dnd-kit/core`, `@dnd-kit/sortable`
+- **Internationalization**: `i18next`, `react-i18next`
+- **Backend & Database**: Supabase PostgreSQL (with static fallback dataset)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Prerequisites
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Node.js (v18+ recommended)
+- npm / pnpm / yarn
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Installation
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Clone repository**:
+   ```bash
+   git clone https://github.com/menako-studio/jumble.git
+   cd jumble
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup (Optional for Supabase sync)**:
+   Create a `.env` file in the root directory:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Run Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+5. **Build for Production**:
+   ```bash
+   npm run build
+   ```
+
+---
+
+## 📄 License
+
+Created by **Menako Studio**.
+
