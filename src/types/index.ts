@@ -9,71 +9,135 @@ export type Country = 'EN' | 'ID';
 export type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B1_PLUS' | 'B2';
 
 export type GrammarCategory =
+  | 'present_tenses'
+  | 'past_tenses'
+  | 'future_tenses'
+  | 'tense_reviews'
+  | 'modals_phrasals'
+  | 'conditionals_wishes'
+  | 'passive_voice'
+  | 'reported_speech'
+  | 'ing_infinitive'
+  | 'articles_nouns_determiners'
+  | 'relative_clauses'
+  | 'there_and_it'
+  | 'auxiliary_verbs'
+  | 'adjectives_adverbs'
+  | 'conjunctions_clauses'
+  | 'prepositions'
+  | 'questions_form'
+  | 'word_order'
+  | 'exam_prep'
+  // Legacy category aliases for backward compatibility
   | 'tenses'
   | 'nouns_articles'
   | 'verbs_modals'
-  | 'adjectives_adverbs'
   | 'pronouns_determiners'
   | 'prepositions_conjunctions'
   | 'sentence_clauses'
-  | 'punctuation_capitalization'
-  | 'exam_prep';
+  | 'punctuation_capitalization';
 
 export type GrammarSubCategory =
-  // Tenses
-  | 'simple_present'
+  // Present Tenses
+  | 'present_simple_be'
+  | 'present_simple'
   | 'present_continuous'
+  | 'present_simple_vs_continuous'
+  | 'have_got'
   | 'present_perfect'
+  | 'present_perfect_vs_past_simple'
   | 'present_perfect_continuous'
-  | 'simple_past'
+  // Past Tenses
+  | 'was_were'
+  | 'past_simple'
+  | 'past_simple_neg_q'
   | 'past_continuous'
   | 'past_perfect'
-  | 'simple_future'
-  | 'future_continuous'
-  | 'future_perfect'
-  // Nouns & Articles
+  | 'narrative_tenses'
+  // Future
+  | 'will_shall'
+  | 'be_going_to'
+  | 'future_continuous_perfect'
+  | 'future_other_forms'
+  | 'future_in_past'
+  // Verb Tense Reviews
+  | 'tense_reviews_a2'
+  | 'tense_reviews_b1'
+  | 'tense_reviews_b2'
+  // Modals & Phrasal Verbs
+  | 'can_could'
+  | 'imperative'
+  | 'would_like'
+  | 'have_to_must'
+  | 'should'
+  | 'might_may'
+  | 'used_to'
+  | 'verb_go'
+  | 'verb_get'
+  | 'do_vs_make'
+  | 'phrasal_verbs'
+  | 'modals_deduction'
+  | 'would_rather'
+  | 'verbs_of_senses'
+  // Conditionals & Wishes
+  | 'first_conditional'
+  | 'second_conditional'
+  | 'third_conditional'
+  | 'mixed_conditionals'
+  | 'wishes_regrets'
+  // Passive
+  | 'passive_forms'
+  | 'reporting_verbs'
+  | 'have_something_done'
+  // Reported Speech
+  | 'direct_indirect_speech'
+  // -ing & Infinitive
+  | 'verbs_ing_infinitive'
+  | 'gerund_or_infinitive'
+  | 'reporting_verbs_pattern'
+  // Articles, Nouns, Pronouns & Determiners
+  | 'articles_a_an_the'
   | 'countable_uncountable'
   | 'singular_plural'
   | 'possessive_nouns'
-  | 'articles'
-  | 'abstract_collective'
-  // Verbs & Modals
-  | 'transitive_intransitive'
-  | 'linking_verbs'
-  | 'modal_verbs'
-  | 'phrasal_verbs'
-  | 'irregular_verbs'
-  | 'passive_voice'
+  | 'quantifiers'
+  | 'pronouns'
+  | 'possessives'
+  // Relative Clauses
+  | 'defining_relative'
+  | 'non_defining_relative'
+  | 'relative_adverbs'
+  // There and It
+  | 'there_is_are'
+  | 'preparatory_subjects'
+  // Auxiliary Verbs
+  | 'so_neither'
+  | 'question_tags'
+  | 'auxiliary_uses'
+  | 'ellipsis_substitution'
   // Adjectives & Adverbs
   | 'descriptive_adjectives'
   | 'comparative_superlative'
   | 'adverbs_frequency'
   | 'adverbs_manner_place'
   | 'order_of_adjectives'
-  // Pronouns & Determiners
-  | 'personal_pronouns'
-  | 'possessive_pronouns'
-  | 'reflexive_pronouns'
-  | 'relative_pronouns'
-  | 'demonstratives_quantifiers'
-  // Prepositions & Conjunctions
+  | 'so_such'
+  | 'negative_inversion'
+  // Conjunctions & Clauses
+  | 'coordinating_conjunctions'
+  | 'clauses_contrast_purpose'
+  | 'discourse_markers'
+  | 'participle_clauses'
+  // Prepositions
   | 'prepositions_time_place'
   | 'prepositions_movement'
-  | 'coordinating_conjunctions'
-  | 'subordinating_conjunctions'
-  | 'correlative_conjunctions'
-  // Sentence & Clauses
-  | 'simple_compound'
-  | 'complex_sentences'
-  | 'relative_clauses'
-  | 'conditionals'
-  | 'reported_speech'
-  // Punctuation & Capitalization
-  | 'commas_periods'
-  | 'apostrophes_possessives'
-  | 'quotation_marks'
-  | 'capitalization_rules'
-  | 'colons_semicolons'
+  | 'verb_prep_collocations'
+  // Questions
+  | 'question_words'
+  | 'indirect_questions'
+  // Word Order
+  | 'basic_word_order'
+  | 'cleft_sentences'
   // Exam Prep
   | 'ielts_grammar'
   | 'toefl_structure'
@@ -150,6 +214,9 @@ export interface GrammarModule {
   conceptIntro?: ConceptIntro;
   questions: Question[];
   level?: number;
+  sequenceOrder?: number;
+  unitGroup?: string;
+  unitGroup_id?: string;
   topic_name?: string;
   topic_name_id?: string;
   isProOnly?: boolean;
