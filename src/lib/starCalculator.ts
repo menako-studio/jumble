@@ -11,20 +11,21 @@ export interface StarResult {
 }
 
 /**
- * @param livesRemaining - How many hearts the player has left (0–3)
- * @param maxLives       - Maximum lives (default 3)
+ * @param mistakesMade   - Total incorrect attempts in the current lesson session
+ * @param totalQuestions - Total questions in the lesson
  */
 export function calculateStars(
-  livesRemaining: number,
-  maxLives: number = 3
+  mistakesMade: number = 0,
+  totalQuestions: number = 5
 ): StarResult {
-  if (livesRemaining <= 0) {
-    return { stars: 0, isPerfect: false, message: 'gameover' };
+  if (totalQuestions <= 0) {
+    return { stars: 1, isPerfect: false, message: 'good' };
   }
-  if (livesRemaining === maxLives) {
+
+  if (mistakesMade === 0) {
     return { stars: 3, isPerfect: true, message: 'perfect' };
   }
-  if (livesRemaining >= maxLives - 1) {
+  if (mistakesMade <= 2) {
     return { stars: 2, isPerfect: false, message: 'great' };
   }
   return { stars: 1, isPerfect: false, message: 'good' };

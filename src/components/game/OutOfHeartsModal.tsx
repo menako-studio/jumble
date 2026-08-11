@@ -7,6 +7,7 @@ interface OutOfHeartsModalProps {
   onRefillHearts: () => void;
   onUpgradePro: () => void;
   onClose: () => void;
+  heartsCount?: number;
 }
 
 export const OutOfHeartsModal: React.FC<OutOfHeartsModalProps> = ({
@@ -14,6 +15,7 @@ export const OutOfHeartsModal: React.FC<OutOfHeartsModalProps> = ({
   onRefillHearts,
   onUpgradePro,
   onClose,
+  heartsCount = 0,
 }) => {
   const [remainingMs, setRemainingMs] = useState(0);
 
@@ -40,6 +42,8 @@ export const OutOfHeartsModal: React.FC<OutOfHeartsModalProps> = ({
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const isZeroHearts = heartsCount <= 0;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
       <motion.div
@@ -47,13 +51,13 @@ export const OutOfHeartsModal: React.FC<OutOfHeartsModalProps> = ({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.85, opacity: 0, y: 20 }}
         transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-        className="w-full max-w-md bg-jumble-card rounded-xl3 p-6 border-2 border-rose-500/40 shadow-glow relative text-center flex flex-col gap-5"
+        className="w-full max-w-md bg-surface-card rounded-xl3 p-6 border-2 border-rose-500/40 shadow-glow relative text-center flex flex-col gap-5"
         id="out-of-hearts-modal"
       >
         {/* Close Icon */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
         >
           ✕
         </button>
@@ -65,9 +69,11 @@ export const OutOfHeartsModal: React.FC<OutOfHeartsModalProps> = ({
             transition={{ repeat: Infinity, duration: 2.5 }}
             className="text-6xl mb-2"
           >
-            💔
+            {isZeroHearts ? '💔' : '❤️'}
           </motion.div>
-          <h3 className="text-white font-black text-2xl">You're Out of Hearts!</h3>
+          <h3 className="text-white font-black text-2xl">
+            {isZeroHearts ? "You're Out of Hearts!" : `Refill Your Hearts (${heartsCount}/5)`}
+          </h3>
           <p className="text-white/70 text-sm mt-1 font-bold">
             Choose how you want to restore your hearts to keep practicing:
           </p>

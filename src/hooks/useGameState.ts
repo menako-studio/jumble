@@ -44,6 +44,7 @@ const initialState: GameState = {
   currentIndex: 0,
   score: 0,
   combo: 0,
+  mistakesCount: 0,
   phase: 'IDLE',
   lastAnswerCorrect: null,
   isReviewMode: false,
@@ -64,6 +65,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...initialState,
         questions: qList,
         currentIndex: 0,
+        mistakesCount: 0,
         phase: 'PLAYING',
         isReviewMode: !!action.payload.isReviewMode,
         ...wordState,
@@ -111,6 +113,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       const newCombo = isCorrect ? state.combo + 1 : 0;
       const newScore = isCorrect ? state.score + points : state.score;
       const newReviewCount = isCorrect && state.isReviewMode ? state.reviewCorrectCount + 1 : state.reviewCorrectCount;
+      const newMistakesCount = isCorrect ? state.mistakesCount : state.mistakesCount + 1;
 
       return {
         ...state,
@@ -118,6 +121,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         lastAnswerCorrect: isCorrect,
         combo: newCombo,
         score: newScore,
+        mistakesCount: newMistakesCount,
         reviewCorrectCount: newReviewCount,
       };
     }

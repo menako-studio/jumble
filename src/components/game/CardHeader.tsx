@@ -12,6 +12,7 @@ interface CardHeaderProps {
   heartsCount: number;
   isProUser?: boolean;
   onExit?: () => void;
+  onOpenRefillModal?: () => void;
 }
 
 export const CardHeader: React.FC<CardHeaderProps> = ({
@@ -22,6 +23,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   heartsCount,
   isProUser = false,
   onExit,
+  onOpenRefillModal,
 }) => {
   const [remainingMs, setRemainingMs] = useState(0);
 
@@ -55,6 +57,8 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
     }
   };
 
+  const canRefill = !isProUser && heartsCount < MAX_HEARTS;
+
   return (
     <header className="sticky top-0 z-30 glass border-b border-surface-border">
       <div className="max-w-lg mx-auto px-4 py-3">
@@ -62,7 +66,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
         <div className="flex items-center gap-3 mb-2.5">
           <button
             onClick={onExit}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Exit lesson"
             id="header-exit-btn"
           >
@@ -78,8 +82,17 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
             <h2 className="text-white font-black text-base truncate">{title}</h2>
           </div>
 
-          {/* Hearts Counter */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-panel/80 border border-surface-border shadow-sm">
+          {/* Hearts Counter (Clickable to Refill) */}
+          <button
+            onClick={onOpenRefillModal}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-panel/80 border transition-all cursor-pointer ${
+              canRefill
+                ? 'border-rose-500/60 hover:border-rose-400 hover:scale-105 shadow-glow'
+                : 'border-surface-border'
+            }`}
+            title={canRefill ? 'Click to refill hearts anytime!' : 'Hearts status'}
+            id="header-hearts-btn"
+          >
             <motion.span
               animate={heartsCount > 0 ? { scale: [1, 1.25, 1] } : { scale: 1 }}
               transition={{ duration: 0.4 }}
@@ -91,12 +104,17 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
               {isProUser ? 'PRO' : `${heartsCount}/${MAX_HEARTS}`}
             </span>
 
-            {!isProUser && heartsCount < MAX_HEARTS && (
-              <span className="text-[10px] text-white/50 font-mono ml-1">
-                ⏱ {formatTimer(remainingMs)}
-              </span>
+            {canRefill && (
+              <div className="flex items-center gap-1 ml-1">
+                <span className="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-black animate-pulse">
+                  + Refill
+                </span>
+                <span className="text-[10px] text-white/50 font-mono hidden sm:inline">
+                  ⏱ {formatTimer(remainingMs)}
+                </span>
+              </div>
             )}
-          </div>
+          </button>
         </div>
 
         {/* Row 2: Progress Bar */}
