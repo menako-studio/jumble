@@ -2,12 +2,12 @@
 
 ## 1. EXECUTIVE SUMMARY & TECH STACK
 ### Core Purpose & Scope
-**Jumble** is a modern, high-performance, gamified English grammar learning web application built by **Menako Studio**. It replicates interactive card-based learning mechanisms (inspired by Brilliant.org & Duolingo) tailored for non-native English speakers (with localized support for English `EN` default and Indonesian `ID`). Users progress through structured **CEFR levels (A1 to B2)** across various grammar modules featuring Word Jumbles (drag-and-drop & tap placement), Multiple Choice, and Fill-in-the-Blank question types.
+**Jumble** is a modern, high-performance, gamified English grammar learning web application built by **Menako Studio**. It replicates interactive card-based learning mechanisms (inspired by Brilliant.org & Duolingo) tailored for non-native English speakers (with localized support for English `EN` default and Indonesian `ID`). Users progress through structured **CEFR levels (A1 to B2)** and **Exam Prep modules (IELTS, TOEFL, TOEIC)** across various grammar categories featuring Word Jumbles (drag-and-drop & tap placement), Multiple Choice, and Fill-in-the-Blank question types.
 
 ### Tech Stack & Core Libraries
 - **Core Framework**: React 19 (`react` ^19.2.6, `react-dom` ^19.2.6) with TypeScript (`typescript` ~6.0.2).
 - **Build Tool & Bundler**: Vite 8 (`vite` ^8.0.12, `@vitejs/plugin-react` ^6.0.1).
-- **Styling & Design System**: Tailwind CSS v3 (`tailwindcss` ^3.4.19, `autoprefixer`, `postcss`), custom glassmorphism utilities in `src/index.css`, custom fonts (`Nunito`, `Outfit` loaded via Google Fonts).
+- **Styling & Design System**: Tailwind CSS v3 (`tailwindcss` ^3.4.19, `autoprefixer`, `postcss`), custom playful Duolingo-inspired & glassmorphism utilities in `src/index.css`, custom fonts (`Nunito`, `Outfit` loaded via Google Fonts).
 - **State Machine & Data Layer**: Reducer State Machine (`useGameState`), Resilient Hybrid Data Hook (`useSupabase` with `localStorage` offline fallback and background sync queue).
 - **Zero-Cost Native TTS**: Web Speech API (`window.speechSynthesis`) encapsulated in `src/lib/speech.ts` with `AudioButton.tsx`.
 - **Backend & Database**: Supabase PostgreSQL (`@supabase/supabase-js` ^2.108.1) with client fallback to static demo data (`GRAMMAR_MODULES`).
@@ -31,13 +31,14 @@ jumble/
 │   ├── components/
 │   │   ├── game/               # Core game flow components
 │   │   │   ├── AnswerZone.tsx              # Drop/tap zone for selected word tiles in Jumble
-│   │   │   ├── CardHeader.tsx              # Top bar (progress bar, heart counter, level badge, exit button)
+│   │   │   ├── CardHeader.tsx              # Top bar (progress bar, heart counter, level badge, exit button, clickable heart refill)
+│   │   │   ├── ConceptIntroWalkthrough.tsx # Interactive Brilliant.org-style pre-lesson grammar concept walkthrough & warmup
 │   │   │   ├── FeedbackOverlay.tsx         # Bottom drawer overlay for correct/incorrect answers & explanations + TTS CTA
 │   │   │   ├── FillInBlankQuestion.tsx     # Fill-in-the-blank question view
 │   │   │   ├── GameOverModal.tsx           # Game over state modal
-      │   │   ├── JumbleLevel.tsx             # Main gameplay orchestrator using state machine & dnd-kit context
+│   │   │   ├── JumbleLevel.tsx             # Main gameplay orchestrator using state machine, concept intro & dnd-kit context
 │   │   │   ├── MultipleChoiceQuestion.tsx  # Multiple choice question view
-│   │   │   ├── OutOfHeartsModal.tsx        # Zero hearts dialog (Review mode / Refill / Pro upgrade options)
+│   │   │   ├── OutOfHeartsModal.tsx        # Zero/refill hearts dialog (Review mode / Refill / Pro upgrade options)
 │   │   │   ├── WinModal.tsx                # Level completion modal with star ratings and points
 │   │   │   ├── WordBank.tsx                # Available word options pool for Jumble questions
 │   │   │   └── WordBlock.tsx               # Draggable & clickable word tile component
@@ -51,7 +52,7 @@ jumble/
 │   │       ├── ProgressBar.tsx            # Smooth animated level completion bar
 │   │       └── StarRating.tsx              # Animated 1-3 star result component
 │   ├── data/
-│   │   └── grammarModules.ts   # Static dataset for CEFR A1-B2 curriculum & out-of-hearts review pool
+│   │   └── grammarModules.ts   # Comprehensive static dataset for CEFR A1-B2 curriculum, sub-categories, exam prep & concept intros
 │   ├── hooks/
 │   │   ├── useConfetti.ts      # Firework & celebratory confetti triggers
 │   │   ├── useGameState.ts     # State Machine hook (IDLE, PLAYING, FEEDBACK, OUT_OF_HEARTS, COMPLETED)
@@ -60,58 +61,58 @@ jumble/
 │   │   ├── evaluator.ts        # String normalization & word array matching logic
 │   │   ├── heartsManager.ts    # Hearts state management (5 hearts max, 4h auto-refill, localStorage persistence, PRO mode)
 │   │   ├── speech.ts           # Zero-cost native Web Speech API TTS wrapper
-│   │   ├── starCalculator.ts   # Star calculation based on remaining hearts & XP scoring
+│   │   ├── starCalculator.ts   # Star calculation based on session mistakesCount (3 stars = 0 mistakes, 2 stars = 1-2, 1 star = >2)
 │   │   └── supabase.ts        # Supabase API client initialization
 │   ├── locales/
 │   │   ├── en/translation.json # Primary English translation dictionary
 │   │   └── id/translation.json # Indonesian translation dictionary
 │   ├── pages/
-│   │   ├── HomePage.tsx        # Hero splash page with start action & level pills
-│   │   ├── LessonsPage.tsx     # Curriculum overview filtered by CEFR level & Grammar Category
+│   │   ├── HomePage.tsx        # Hero splash page with start action, category selector & exam prep badges
+│   │   ├── LessonsPage.tsx     # Curriculum overview filtered by CEFR level, Grammar Sub-Category & Exam Prep filters
 │   │   └── PlayPage.tsx        # Route wrapper extracting `:id` parameter to launch `JumbleLevel`
 │   ├── types/
-│   │   └── index.ts            # Centralized TypeScript domain interfaces
+│   │   └── index.ts            # Centralized TypeScript domain interfaces (GrammarCategory, GrammarSubCategory, ConceptIntro)
 │   ├── App.css                 # Custom component animations & extra styles
 │   ├── App.tsx                 # Root router configuration (`/`, `/lessons`, `/play/:id`)
 │   ├── i18n.ts                 # i18next setup (EN default, ID secondary)
-│   ├── index.css               # Design system tokens, color palettes, background gradients, glassmorphism utilities
+│   ├── index.css               # Design system tokens, color palettes, playful background gradients, glassmorphism utilities
 │   └── main.tsx                # React root mount point
 ├── index.html                  # HTML entry point loading Google Fonts (Nunito, Outfit)
-├── tailwind.config.js          # Tailwind theme extension (colors, gradients, border radius, animations)
+├── tailwind.config.js          # Tailwind theme extension (Duolingo color palette, 3D shadows, border radius, animations)
 ├── tsconfig.json / tsconfig.app.json / tsconfig.node.json # TypeScript project settings
 └── vite.config.ts              # Vite configuration with React plugin & path aliases
 ```
 
 ### Architectural Patterns
 - **Feature-first / Component-based Structure**: Logic is clean and isolated between presentational UI components (`src/components/ui`), gameplay components (`src/components/game`), domain logic (`src/lib`), and pages (`src/pages`).
-- **State Machine Pattern**: `useGameState` manages game phases (`IDLE`, `PLAYING`, `FEEDBACK`, `OUT_OF_HEARTS`, `COMPLETED`) via a clean `useReducer` to prevent fragmented state bugs.
+- **State Machine Pattern**: `useGameState` manages game phases (`IDLE`, `PLAYING`, `FEEDBACK`, `OUT_OF_HEARTS`, `COMPLETED`) via a clean `useReducer` to prevent fragmented state bugs. Tracks `mistakesCount` across session for star calculations.
 - **Offline-First & Resilient UX**: Local progress is stored immediately in `localStorage` (`jumble_completed_lessons`) and synchronized to Supabase in the background via `syncPendingProgress()` when online.
 - **Zero-Cost Native TTS**: Native Web Speech API integration (`window.speechSynthesis`) provides sentence and vocabulary pronunciation with zero third-party API costs or latency.
-- **Client-Side State Persistence**: The Hearts system uses `localStorage` (`jumble_hearts_count`, `jumble_last_heart_restored`, `jumble_is_pro_user`) with automated time-decay passive recovery (1 heart per 4 hours).
+- **Client-Side State Persistence & On-Demand Refill**: The Hearts system uses `localStorage` (`jumble_hearts_count`, `jumble_last_heart_restored`, `jumble_is_pro_user`) with automated time-decay passive recovery (1 heart per 4 hours) and instant manual refill support anytime directly from header/modal.
 
 ---
 
 ## 3. CURRENT IMPLEMENTATION STATE & DATA FLOW
 ### Active Modules & Core Features
-1. **Curriculum Engine (CEFR A1–B2)**:
-   - Structured grammar topics categorized into `tenses`, `verbs_modals`, `nouns_pronouns`, `adjectives_adverbs`, `clauses_conditionals`, and `passive_reported`.
-   - Built-in modules: Present Simple, Verb "To Be" & Can, Past Simple & Continuous, Comparatives & Superlatives, Present Perfect, Modals of Obligation, Conditionals Type 1 & 2, Passive Voice & Indirect Speech.
+1. **Curriculum & Exam Prep Engine**:
+   - Comprehensive grammar sub-categories across 8 main categories (`tenses`, `nouns_articles`, `verbs_modals`, `adjectives_adverbs`, `pronouns_determiners`, `prepositions_conjunctions`, `sentence_clauses`, `punctuation_capitalization`) and Exam Prep (`IELTS`, `TOEFL`, `TOEIC`).
+   - Interactive pre-lesson concept walkthrough (`ConceptIntroWalkthrough`) with formulas, rule breakdowns, examples, and warm-up questions.
 2. **Interactive Gameplay Types**:
    - **Jumble**: Drag-and-drop or tap-to-select word tiles into slot arrays.
-   - **Multiple Choice**: Choice selection card interface.
+   - **Multiple Choice**: Sleek 3D visual choice selection cards.
    - **Fill-in-the-Blank**: Sentence completion options.
 3. **Hearts & Gamification System**:
    - Max 5 hearts capacity; 1 heart lost on incorrect answer.
-   - Passive refill: +1 Heart every 4 hours.
-   - Out-of-Hearts Review Mode: Infinite free practice mode (5 questions from pool to earn +1 heart).
-   - Instant full refill or Unlimited PRO toggle.
+   - Refill hearts anytime by tapping heart badge in header or via modal.
+   - Out-of-Hearts Review Mode: Infinite free practice mode to earn +1 heart.
+   - Star calculation based on session performance/mistakes (`0 mistakes = 3 stars`, `1-2 mistakes = 2 stars`, `>2 mistakes = 1 star`).
    - XP system with multiplier combo streaks (`score += 100 * min(combo, 5)`).
 4. **Localization (i18n)**:
    - 2-way toggle (`EN` default, `ID` secondary). Japanese `JP` has been completely deprecated.
 
 ### Primary Data Flow
 ```
-HomePage -> LessonsPage (Filters by CEFR/Category via useLessons hook)
+HomePage -> LessonsPage (Filters by CEFR/Sub-Category/Exam Prep via useLessons hook)
                 │
                 ▼
       Navigate to /play/:id
@@ -120,12 +121,12 @@ HomePage -> LessonsPage (Filters by CEFR/Category via useLessons hook)
 PlayPage (Fetches module questions via useQuestions hook)
                 │
                 ▼
-         JumbleLevel component (State machine initialized in useGameState)
+         JumbleLevel component (ConceptIntroWalkthrough -> State machine initialized in useGameState)
                 │
  ┌──────────────┼──────────────┐
  │ (Check Ans)  │ (Incorrect)  │ (Win Phase)
  ▼              ▼              ▼
-Combo +1    Deduct Heart   Calculate Stars (calculateStars)
+Combo +1    Deduct Heart   Calculate Stars based on mistakesCount (calculateStars)
 XP Score    Trigger Drawer  Save Progress (saveProgress API & LocalStorage)
 Confetti    Check Hearts   Show Win Modal
 ```

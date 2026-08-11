@@ -1,21 +1,23 @@
 # Jumble 🧩
 
-**Jumble** is a modern, high-performance, gamified English grammar learning web application built by **Menako Studio**. Inspired by interactive card-based learning mechanisms like Brilliant.org and Duolingo, Jumble helps non-native English speakers master English grammar from **CEFR levels A1 to B2** through interactive word jumbles, multiple choice, and fill-in-the-blank questions.
+**Jumble** is a modern, high-performance, gamified English grammar learning web application built by **Menako Studio**. Inspired by interactive card-based learning mechanisms like Brilliant.org and Duolingo, Jumble helps non-native English speakers master English grammar from **CEFR levels A1 to B2** and targeted **Exam Prep (IELTS, TOEFL, TOEIC)** through interactive word jumbles, multiple choice, and fill-in-the-blank questions.
 
 ---
 
 ## ✨ Key Features
 
-- **Interactive Question Types**:
+- **Interactive Question Types & Pre-Lesson Concept Intros**:
+  - **Concept Walkthrough**: Interactive Brilliant.org-style pre-challenge intro slides featuring formulas, grammar rule breakdowns, audio pronunciations, and warm-up questions.
   - **Word Jumble**: Drag-and-drop or tap-to-select word tiles powered by `@dnd-kit`.
-  - **Multiple Choice**: Sleek visual selection cards.
+  - **Multiple Choice**: Sleek 3D visual selection cards.
   - **Fill in the Blank**: Sentence completion tasks with real-time feedback.
-- **Structured CEFR Curriculum**:
-  - Modules categorized across CEFR levels A1, A2, B1, and B2.
-  - Covered categories: Tenses, Verbs & Modals, Nouns & Pronouns, Adjectives & Adverbs, Clauses & Conditionals, and Passive/Reported Speech.
-- **Gamification & Hearts Engine**:
-  - Heart counter (max 5) with automated passive recovery (1 heart / 4 hours).
-  - Out-of-Hearts Review Mode: Infinite practice pool to recover hearts.
+- **Comprehensive CEFR Curriculum & Exam Prep**:
+  - Modules categorized across CEFR levels (A1, A2, B1, B2) and specialized Exam Prep (IELTS, TOEFL, TOEIC).
+  - Detailed grammar sub-categories: Tenses, Nouns & Articles, Verbs & Modals, Adjectives & Adverbs, Pronouns & Determiners, Prepositions & Conjunctions, Sentence & Clauses, and Punctuation.
+- **Playful Duolingo-Inspired UX & Gamification**:
+  - Vibrant, tactile 3D UI with playful color palettes, glassmorphism cards, and fluid animations.
+  - **Anytime Heart Refill**: Tap heart counter anytime to open refill modal or launch Out-of-Hearts Review Mode.
+  - **Session-Based Star Scoring**: Star rating computed accurately from session mistakes (0 mistakes = 3 stars, 1-2 mistakes = 2 stars, >2 = 1 star).
   - XP multiplier combo streaks and celebratory confetti visual FX.
 - **Zero-Cost Native Text-to-Speech (TTS)**:
   - Integrated audio playback using browser-native Web Speech API.
