@@ -10,11 +10,74 @@ export type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B1_PLUS' | 'B2';
 
 export type GrammarCategory =
   | 'tenses'
+  | 'nouns_articles'
   | 'verbs_modals'
-  | 'nouns_pronouns'
   | 'adjectives_adverbs'
-  | 'clauses_conditionals'
-  | 'passive_reported';
+  | 'pronouns_determiners'
+  | 'prepositions_conjunctions'
+  | 'sentence_clauses'
+  | 'punctuation_capitalization'
+  | 'exam_prep';
+
+export type GrammarSubCategory =
+  // Tenses
+  | 'simple_present'
+  | 'present_continuous'
+  | 'present_perfect'
+  | 'present_perfect_continuous'
+  | 'simple_past'
+  | 'past_continuous'
+  | 'past_perfect'
+  | 'simple_future'
+  | 'future_continuous'
+  | 'future_perfect'
+  // Nouns & Articles
+  | 'countable_uncountable'
+  | 'singular_plural'
+  | 'possessive_nouns'
+  | 'articles'
+  | 'abstract_collective'
+  // Verbs & Modals
+  | 'transitive_intransitive'
+  | 'linking_verbs'
+  | 'modal_verbs'
+  | 'phrasal_verbs'
+  | 'irregular_verbs'
+  | 'passive_voice'
+  // Adjectives & Adverbs
+  | 'descriptive_adjectives'
+  | 'comparative_superlative'
+  | 'adverbs_frequency'
+  | 'adverbs_manner_place'
+  | 'order_of_adjectives'
+  // Pronouns & Determiners
+  | 'personal_pronouns'
+  | 'possessive_pronouns'
+  | 'reflexive_pronouns'
+  | 'relative_pronouns'
+  | 'demonstratives_quantifiers'
+  // Prepositions & Conjunctions
+  | 'prepositions_time_place'
+  | 'prepositions_movement'
+  | 'coordinating_conjunctions'
+  | 'subordinating_conjunctions'
+  | 'correlative_conjunctions'
+  // Sentence & Clauses
+  | 'simple_compound'
+  | 'complex_sentences'
+  | 'relative_clauses'
+  | 'conditionals'
+  | 'reported_speech'
+  // Punctuation & Capitalization
+  | 'commas_periods'
+  | 'apostrophes_possessives'
+  | 'quotation_marks'
+  | 'capitalization_rules'
+  | 'colons_semicolons'
+  // Exam Prep
+  | 'ielts_grammar'
+  | 'toefl_structure'
+  | 'toeic_business';
 
 export type QuestionType = 'jumble' | 'multiple_choice' | 'fill_in_blank';
 
@@ -37,6 +100,28 @@ export interface QuestionExplanation {
   exampleContext?: string;
 }
 
+export interface ConceptIntroSlide {
+  title: string;
+  title_id?: string;
+  formula?: string;
+  ruleExplanation: string;
+  ruleExplanation_id?: string;
+  examples: string[];
+  examples_id?: string[];
+  warmupQuestion?: {
+    prompt: string;
+    prompt_id?: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+    explanation_id?: string;
+  };
+}
+
+export interface ConceptIntro {
+  slides: ConceptIntroSlide[];
+}
+
 export interface Question {
   id: string;
   lesson_id?: string;
@@ -57,14 +142,18 @@ export interface GrammarModule {
   id: string;
   cefrLevel: CEFRLevel;
   category: GrammarCategory;
+  subCategory?: GrammarSubCategory;
   title: string;
   title_id?: string;
   description: string;
   description_id?: string;
+  conceptIntro?: ConceptIntro;
   questions: Question[];
   level?: number;
   topic_name?: string;
   topic_name_id?: string;
+  isProOnly?: boolean;
+  examType?: 'IELTS' | 'TOEFL' | 'TOEIC';
 }
 
 // Aliases for backwards compatibility
@@ -101,6 +190,7 @@ export interface GameState {
   currentIndex: number;
   score: number;
   combo: number;
+  mistakesCount: number;
   phase: GamePhase;
   lastAnswerCorrect: boolean | null;
   isReviewMode: boolean;
