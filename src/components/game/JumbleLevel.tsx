@@ -1,22 +1,4 @@
-/**
- * JumbleLevel.tsx ⭐ — The Core Gameplay Component
- *
- * This component orchestrates:
- *   1. DnD context (dnd-kit) for drag-and-drop between WordBank and AnswerZone
- *   2. Game state via useGameState reducer (lives, combo, score, phase)
- *   3. Question progression and phase transitions
- *   4. Visual feedback: shake animation, correct/incorrect highlighting
- *   5. Win/GameOver modals with confetti
- *
- * State Machine Phases:
- *   loading → playing → correct/incorrect → playing → ... → win | gameover
- *
- * Word ID system:
- *   Each word gets a unique id: `{zone}_{word}_{originalIndex}`
- *   This handles duplicate words correctly (e.g. "the the cat")
- */
-
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   DndContext,
   type DragEndEvent,
@@ -33,289 +15,215 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
-
 import { useConfetti } from '../../hooks/useConfetti';
+import { useGameState } from '../../hooks/useGameState';
 import { calculateStars } from '../../lib/starCalculator';
 import { checkAnswer } from '../../lib/evaluator';
+import {
+  getHeartsState,
+  deductHeart,
+  refillAllHearts,
+  setProUserStatus,
+} from '../../lib/heartsManager';
+import { saveProgress, addUserPoints } from '../../hooks/useSupabase';
 
-import { ProgressBar } from '../ui/ProgressBar';
-import { HeartBar } from '../ui/HeartBar';
-import { ComboDisplay } from '../ui/ComboDisplay';
+import { CardHeader } from './CardHeader';
 import { Button } from '../ui/Button';
 import { WordBank } from './WordBank';
 import { AnswerZone } from './AnswerZone';
 import { WordBlock } from './WordBlock';
+import { MultipleChoiceQuestion } from './MultipleChoiceQuestion';
+import { FillInBlankQuestion } from './FillInBlankQuestion';
 import { FeedbackOverlay } from './FeedbackOverlay';
+import { OutOfHeartsModal } from './OutOfHeartsModal';
 import { WinModal } from './WinModal';
 import { GameOverModal } from './GameOverModal';
-import { LanguageSwitcher } from '../layout/LanguageSwitcher';
+import { AudioButton } from '../ui/AudioButton';
 
-import type { Question } from '../../types';
-
-// ——— Types ———
-
-interface WordItem {
-  id: string;
-  word: string;
-}
+import type { Question, CEFRLevel, HeartsState, WordItem } from '../../types';
 
 interface JumbleLevelProps {
   questions: Question[];
   lessonName: string;
+  cefrLevel?: CEFRLevel;
   onComplete?: (stars: number, score: number) => void;
   onExit?: () => void;
 }
 
-
-// ——— Helper: build word item list from string array ———
-
-function buildItems(words: string[], zone: 'bank' | 'ans'): WordItem[] {
-  return words.map((word, i) => ({ id: `${zone}_${word}_${i}`, word }));
-}
-
-// ============================================================
-// COMPONENT
-// ============================================================
-
 export const JumbleLevel: React.FC<JumbleLevelProps> = ({
-  questions,
+  questions: initialQuestions,
   lessonName,
+  cefrLevel,
   onComplete: _onComplete,
   onExit,
 }) => {
   const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'en' | 'id';
   const { fireWin, fireCorrect } = useConfetti();
 
-  // ——— Core game state ———
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [lives, setLives] = useState(3);
-  const [combo, setCombo] = useState(0);
-  const [score, setScore] = useState(0);
+  const { state, actions } = useGameState(initialQuestions);
+  const [heartsState, setHeartsState] = React.useState<HeartsState>(() => getHeartsState());
+  const [activeItem, setActiveItem] = React.useState<WordItem | null>(null);
+  const [shaking, setShaking] = React.useState(false);
 
-  type Phase = 'playing' | 'correct' | 'incorrect' | 'win' | 'gameover';
-  const [phase, setPhase] = useState<Phase>('playing');
-
-  // ——— Word lists (using stable ids) ———
-  const [bankItems, setBankItems] = useState<WordItem[]>(() => {
-    const q = questions[0];
-    if (!q) return [];
-    const shuffled = [...q.jumbled_word_order].sort(() => Math.random() - 0.5);
-    return buildItems(shuffled, 'bank');
-  });
-  const [answerItems, setAnswerItems] = useState<WordItem[]>([]);
-
-  // ——— Active drag tracking (for DragOverlay) ———
-  const [activeItem, setActiveItem] = useState<WordItem | null>(null);
-
-  // ——— Shake animation trigger ———
-  const [shaking, setShaking] = useState(false);
-
-  // ——— dnd-kit sensors (pointer + touch with 8px delay) ———
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } })
   );
 
-  // ——— Current question ———
-  const currentQ = questions[currentIndex];
-  const lang = i18n.language as 'id' | 'jp';
-  const explanation = lang === 'jp' ? currentQ?.explanation_jp : currentQ?.explanation_id;
+  const currentQ = state.questions[state.currentIndex];
 
-  // ——— DnD handlers ———
+  // Refresh hearts state on load & mode change
+  useEffect(() => {
+    const fresh = getHeartsState();
+    setHeartsState(fresh);
+  }, [state.isReviewMode]);
 
+  // Handle DnD events
   const handleDragStart = ({ active }: DragStartEvent) => {
-    const item =
-      bankItems.find((i) => i.id === active.id) ||
-      answerItems.find((i) => i.id === active.id);
+    const item = state.bankItems.find((i) => i.id === active.id) || state.answerItems.find((i) => i.id === active.id);
     setActiveItem(item ?? null);
   };
 
   const handleDragOver = ({ active, over }: DragOverEvent) => {
     if (!over) return;
+    const activeInBank = state.bankItems.some((i) => i.id === active.id);
+    const activeInAnswer = state.answerItems.some((i) => i.id === active.id);
+    const overInAnswer = state.answerItems.some((i) => i.id === over.id) || over.id === 'answer-zone';
+    const overInBank = state.bankItems.some((i) => i.id === over.id) || over.id === 'word-bank';
 
-    const activeInBank = bankItems.some((i) => i.id === active.id);
-    const activeInAnswer = answerItems.some((i) => i.id === active.id);
-    const overInAnswer = answerItems.some((i) => i.id === over.id) || over.id === 'answer-zone';
-    const overInBank = bankItems.some((i) => i.id === over.id) || over.id === 'word-bank';
-
-    // Bank → Answer
     if (activeInBank && overInAnswer) {
-      const item = bankItems.find((i) => i.id === active.id)!;
-      setBankItems((prev) => prev.filter((i) => i.id !== active.id));
-      setAnswerItems((prev) => {
-        if (prev.find((i) => i.id === active.id)) return prev;
-        const overIndex = prev.findIndex((i) => i.id === over.id);
-        const newItems = [...prev];
-        if (overIndex >= 0) {
-          newItems.splice(overIndex, 0, item);
-        } else {
-          newItems.push(item);
-        }
-        return newItems;
-      });
+      const item = state.bankItems.find((i) => i.id === active.id)!;
+      actions.reorderBank(state.bankItems.filter((i) => i.id !== active.id));
+      const overIndex = state.answerItems.findIndex((i) => i.id === over.id);
+      const newAns = [...state.answerItems];
+      if (overIndex >= 0) newAns.splice(overIndex, 0, item);
+      else newAns.push(item);
+      actions.reorderAnswer(newAns);
     }
 
-    // Answer → Bank
     if (activeInAnswer && overInBank) {
-      const item = answerItems.find((i) => i.id === active.id)!;
-      setAnswerItems((prev) => prev.filter((i) => i.id !== active.id));
-      setBankItems((prev) => {
-        if (prev.find((i) => i.id === active.id)) return prev;
-        return [...prev, item];
-      });
+      const item = state.answerItems.find((i) => i.id === active.id)!;
+      actions.reorderAnswer(state.answerItems.filter((i) => i.id !== active.id));
+      if (!state.bankItems.some((i) => i.id === active.id)) {
+        actions.reorderBank([...state.bankItems, item]);
+      }
     }
   };
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveItem(null);
     if (!over) return;
-
-    // Reorder within answer zone
-    if (answerItems.find((i) => i.id === active.id) && answerItems.find((i) => i.id === over.id)) {
-      setAnswerItems((items) => {
-        const oldIdx = items.findIndex((i) => i.id === active.id);
-        const newIdx = items.findIndex((i) => i.id === over.id);
-        return arrayMove(items, oldIdx, newIdx);
-      });
+    if (state.answerItems.find((i) => i.id === active.id) && state.answerItems.find((i) => i.id === over.id)) {
+      const oldIdx = state.answerItems.findIndex((i) => i.id === active.id);
+      const newIdx = state.answerItems.findIndex((i) => i.id === over.id);
+      actions.reorderAnswer(arrayMove(state.answerItems, oldIdx, newIdx));
     }
-
-    // Reorder within bank
-    if (bankItems.find((i) => i.id === active.id) && bankItems.find((i) => i.id === over.id)) {
-      setBankItems((items) => {
-        const oldIdx = items.findIndex((i) => i.id === active.id);
-        const newIdx = items.findIndex((i) => i.id === over.id);
-        return arrayMove(items, oldIdx, newIdx);
-      });
+    if (state.bankItems.find((i) => i.id === active.id) && state.bankItems.find((i) => i.id === over.id)) {
+      const oldIdx = state.bankItems.findIndex((i) => i.id === active.id);
+      const newIdx = state.bankItems.findIndex((i) => i.id === over.id);
+      actions.reorderBank(arrayMove(state.bankItems, oldIdx, newIdx));
     }
   };
 
-  // ——— Click-to-move (tap accessibility) ———
-
-  const handleBankClick = (id: string, word: string) => {
-    if (phase !== 'playing') return;
-    setBankItems((prev) => prev.filter((i) => i.id !== id));
-    setAnswerItems((prev) => [...prev, { id, word }]);
-  };
-
-  const handleAnswerClick = (id: string, word: string) => {
-    if (phase !== 'playing') return;
-    setAnswerItems((prev) => prev.filter((i) => i.id !== id));
-    setBankItems((prev) => [...prev, { id, word }]);
-  };
-
-  // ——— Submit handler ———
-
+  // Submit Handler
   const handleSubmit = () => {
-    if (phase !== 'playing' || answerItems.length === 0) return;
+    if (state.phase !== 'PLAYING' || !currentQ) return;
 
-    const userAnswer = answerItems.map((i) => i.word);
-    const isCorrect = checkAnswer(userAnswer, currentQ.correct_word_order);
+    let isCorrect = false;
+
+    if (currentQ.type === 'multiple_choice') {
+      if (!state.mcSelected) return;
+      isCorrect = state.mcSelected.trim().toLowerCase() === String(currentQ.correctAnswer).trim().toLowerCase();
+    } else if (currentQ.type === 'fill_in_blank') {
+      if (!state.fibSelected) return;
+      isCorrect = state.fibSelected.trim().toLowerCase() === String(currentQ.correctAnswer).trim().toLowerCase();
+    } else {
+      const userWords = state.answerItems.map((i) => i.word);
+      const expected = currentQ.correct_word_order || (Array.isArray(currentQ.correctAnswer) ? currentQ.correctAnswer : []);
+      isCorrect = checkAnswer(userWords, expected);
+    }
 
     if (isCorrect) {
-      const newCombo = combo + 1;
-      const multiplier = Math.min(newCombo, 5);
-      const points = 100 * Math.max(multiplier, 1);
-
-      setCombo(newCombo);
-      setScore((s) => s + points);
+      const points = 100 * Math.min(state.combo + 1, 5);
       fireCorrect();
-
-      const isLast = currentIndex === questions.length - 1;
-      if (isLast) {
-        // Slight delay so the correct highlight shows before modal
-        setTimeout(() => {
-          setPhase('win');
-          fireWin();
-        }, 600);
-      } else {
-        setPhase('correct');
-      }
+      actions.submitAnswer(true, points, false);
     } else {
-      const newLives = lives - 1;
-      setLives(newLives);
-      setCombo(0);
-
-      // Trigger shake
       setShaking(true);
       setTimeout(() => setShaking(false), 600);
 
-      if (newLives <= 0) {
-        setTimeout(() => setPhase('gameover'), 500);
-      } else {
-        setPhase('incorrect');
+      let isOut = false;
+      if (!state.isReviewMode && !heartsState.isProUser) {
+        const updated = deductHeart();
+        setHeartsState(updated);
+        isOut = updated.heartsCount <= 0;
       }
+      actions.submitAnswer(false, 0, isOut);
     }
   };
 
-  // ——— Advance to next question ———
-
+  // Continue to next question or win screen
   const handleContinue = () => {
-    const next = currentIndex + 1;
-    if (next >= questions.length) {
-      setPhase('win');
+    actions.continueNext();
+  };
+
+  // Save progress when completed
+  useEffect(() => {
+    if (state.phase === 'COMPLETED') {
+      const starResult = calculateStars(heartsState.heartsCount);
       fireWin();
-    } else {
-      setCurrentIndex(next);
-      const q = questions[next];
-      if (q) {
-        const shuffled = [...q.jumbled_word_order].sort(() => Math.random() - 0.5);
-        setBankItems(buildItems(shuffled, 'bank'));
-        setAnswerItems([]);
-        setPhase('playing');
-      }
+      saveProgress('demo-user', currentQ?.lesson_id || 'lesson-1', starResult.stars);
+      addUserPoints('demo-user', state.score, starResult.stars);
     }
+  }, [state.phase, heartsState.heartsCount, state.score, currentQ?.lesson_id, fireWin]);
+
+  // Out of hearts modal triggers
+  const handleStartReviewMode = () => {
+    actions.startReviewSession();
   };
 
-  // ——— Restart ———
-
-  const handleRestart = () => {
-    setCurrentIndex(0);
-    setLives(3);
-    setCombo(0);
-    setScore(0);
-    const q = questions[0];
-    if (q) {
-      const shuffled = [...q.jumbled_word_order].sort(() => Math.random() - 0.5);
-      setBankItems(buildItems(shuffled, 'bank'));
-      setAnswerItems([]);
-      setPhase('playing');
-    }
+  const handleRefillAll = () => {
+    const fresh = refillAllHearts();
+    setHeartsState(fresh);
+    actions.refillHearts();
   };
 
-  const handleBackToLessons = () => {
-    if (phase === 'win' && _onComplete) {
-      _onComplete(starResult.stars, score);
-    } else {
-      onExit?.();
-    }
+  const handleUpgradeToPro = () => {
+    const fresh = setProUserStatus(true);
+    setHeartsState(fresh);
+    actions.refillHearts();
   };
 
-  // ——— Star result ———
-  const starResult = calculateStars(lives);
+  const getRevealedCorrectAnswerText = (): string => {
+    if (!currentQ) return '';
+    if (Array.isArray(currentQ.correctAnswer)) {
+      return currentQ.correctAnswer.join(' ');
+    }
+    if (currentQ.correct_word_order) {
+      return currentQ.correct_word_order.join(' ');
+    }
+    return String(currentQ.correctAnswer);
+  };
 
-  // ——— Determine answer zone visual variant ———
-  const answerVariant =
-    phase === 'correct' || phase === 'win' ? 'correct' :
-    phase === 'incorrect' || phase === 'gameover' ? 'incorrect' :
-    'answer';
-
-  // ——— Can submit? ———
-  const canSubmit =
-    phase === 'playing' &&
-    answerItems.length > 0 &&
-    answerItems.length === currentQ?.correct_word_order.length;
-
-  // ============================================================
-  // RENDER
-  // ============================================================
+  const canSubmit = (): boolean => {
+    if (state.phase !== 'PLAYING' || !currentQ) return false;
+    if (currentQ.type === 'multiple_choice') return !!state.mcSelected;
+    if (currentQ.type === 'fill_in_blank') return !!state.fibSelected;
+    const expectedLength = (currentQ.correct_word_order || currentQ.correctAnswer)?.length ?? 0;
+    return state.answerItems.length > 0 && state.answerItems.length === expectedLength;
+  };
 
   if (!currentQ) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-white/50 text-lg">{t('ui.loading')}</p>
+      <div className="flex items-center justify-center min-h-screen bg-jumble">
+        <p className="text-white/60 font-black animate-pulse">{t('ui.loading', 'Loading questions...')}</p>
       </div>
     );
   }
+
+  const isJumble = !currentQ.type || currentQ.type === 'jumble';
+  const starResult = calculateStars(heartsState.heartsCount);
+  const promptText = lang === 'id' && currentQ.prompt_id ? currentQ.prompt_id : currentQ.prompt;
 
   return (
     <DndContext
@@ -325,153 +233,168 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="bg-jumble min-h-dvh flex flex-col font-nunito">
+      <div className="bg-jumble min-h-dvh flex flex-col font-nunito relative">
+        {/* Card Header */}
+        <CardHeader
+          title={state.isReviewMode ? '❤️ Review Practice (+1 Heart)' : lessonName}
+          cefrLevel={cefrLevel}
+          currentIndex={state.currentIndex}
+          totalQuestions={state.questions.length}
+          heartsCount={heartsState.heartsCount}
+          isProUser={heartsState.isProUser}
+          onExit={onExit}
+        />
 
-        {/* ====================================================
-            TOP HEADER
-            ==================================================== */}
-        <header className="sticky top-0 z-30 glass border-b border-surface-border">
-          <div className="max-w-lg mx-auto px-4 py-3">
-            {/* Row 1: Exit + Lesson name + Lang switcher */}
-            <div className="flex items-center gap-3 mb-3">
-              <button
-                onClick={onExit}
-                className="btn-ghost btn btn-sm px-2"
-                aria-label="Exit lesson"
-                id="exit-btn"
-              >
-                ✕
-              </button>
-              <p className="text-white/70 font-bold text-sm flex-1 truncate">{lessonName}</p>
-              <LanguageSwitcher />
-            </div>
+        {/* Main Content Area */}
+        <main className="flex-1 flex flex-col max-w-lg mx-auto w-full px-4 py-6 gap-6 justify-between">
+          {/* Top XP Bar & Review Progress */}
+          <div className="flex items-center justify-between">
+            <motion.div
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-light"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <span className="text-accent-400 text-lg">⚡</span>
+              <span className="text-white font-black text-sm">{state.score.toLocaleString()} XP</span>
+            </motion.div>
 
-            {/* Row 2: Progress bar + Lives + Combo */}
-            <div className="flex items-center gap-3">
-              <ProgressBar current={currentIndex} total={questions.length} />
-              <HeartBar lives={lives} />
-              <ComboDisplay combo={combo} />
-            </div>
-
-            {/* Question counter */}
-            <p className="text-white/40 text-xs font-semibold mt-2 text-right">
-              {t('ui.questionOf', { current: currentIndex + 1, total: questions.length })}
-            </p>
-          </div>
-        </header>
-
-        {/* ====================================================
-            MAIN PLAY AREA
-            ==================================================== */}
-        <main className="flex-1 flex flex-col max-w-lg mx-auto w-full px-4 py-6 gap-6">
-
-          {/* Score badge */}
-          <motion.div
-            className="self-start flex items-center gap-2 px-3 py-1.5 rounded-full glass-light"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <span className="text-accent-400 text-lg">⚡</span>
-            <span className="text-white font-black text-sm">{score.toLocaleString()}</span>
-          </motion.div>
-
-          {/* Instruction */}
-          <motion.p
-            key={currentIndex}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-white font-bold text-lg text-center leading-snug"
-          >
-            {t('ui.arrangeWords')}
-          </motion.p>
-
-          {/* ——— ANSWER ZONE ——— */}
-          <motion.div
-            animate={shaking ? { x: [-10, 10, -8, 8, -4, 4, 0] } : { x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <AnswerZone
-              items={answerItems}
-              variant={answerVariant}
-              onWordClick={handleAnswerClick}
-              disabled={phase !== 'playing'}
-            />
-          </motion.div>
-
-          {/* ——— WORD BANK ——— */}
-          <div className="glass rounded-xl2 p-3">
-            <WordBank
-              items={bankItems}
-              onWordClick={handleBankClick}
-              disabled={phase !== 'playing'}
-            />
+            {state.isReviewMode && (
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black">
+                Review Goal: {state.reviewCorrectCount}/5 Correct
+              </span>
+            )}
           </div>
 
-          {/* ——— CHECK BUTTON ——— */}
+          {/* Question Card */}
+          <div className="w-full flex-1 flex flex-col justify-center">
+            {currentQ.type === 'multiple_choice' ? (
+              <MultipleChoiceQuestion
+                prompt={promptText}
+                options={currentQ.options || []}
+                selectedOption={state.mcSelected}
+                onSelect={actions.selectMC}
+                disabled={state.phase !== 'PLAYING'}
+              />
+            ) : currentQ.type === 'fill_in_blank' ? (
+              <FillInBlankQuestion
+                prompt={promptText}
+                options={currentQ.options || []}
+                selectedAnswer={state.fibSelected}
+                onSelect={actions.selectFIB}
+                disabled={state.phase !== 'PLAYING'}
+              />
+            ) : (
+              // Jumble Question
+              <div className="flex flex-col gap-6 w-full">
+                <motion.div
+                  key={state.currentIndex}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-center gap-3 text-center"
+                >
+                  <p className="text-white font-black text-lg leading-snug">
+                    {promptText || t('ui.arrangeWords', 'Arrange the words in correct order:')}
+                  </p>
+                  <AudioButton text={getRevealedCorrectAnswerText()} size="sm" variant="glass" />
+                </motion.div>
+
+                <motion.div
+                  animate={shaking ? { x: [-10, 10, -8, 8, -4, 4, 0] } : { x: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <AnswerZone
+                    items={state.answerItems}
+                    variant={state.lastAnswerCorrect === true ? 'correct' : state.lastAnswerCorrect === false ? 'incorrect' : 'answer'}
+                    onWordClick={(id, word) => actions.moveWordToBank(id, word)}
+                    disabled={state.phase !== 'PLAYING'}
+                  />
+                </motion.div>
+
+                <div className="glass rounded-xl2 p-3">
+                  <WordBank
+                    items={state.bankItems}
+                    onWordClick={(id, word) => actions.moveWordToAnswer(id, word)}
+                    disabled={state.phase !== 'PLAYING'}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Submit Action Button */}
           <AnimatePresence>
-            {phase === 'playing' && (
+            {state.phase === 'PLAYING' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
+                className="w-full"
               >
                 <Button
-                  variant={canSubmit ? 'success' : 'ghost'}
+                  variant={canSubmit() ? 'success' : 'ghost'}
                   size="lg"
                   onClick={handleSubmit}
-                  disabled={!canSubmit}
-                  className="w-full"
+                  disabled={!canSubmit()}
+                  className="w-full py-4 text-lg font-black"
                   id="check-btn"
                 >
-                  {t('ui.check')}
+                  {t('ui.check', 'Check Answer')}
                 </Button>
               </motion.div>
             )}
           </AnimatePresence>
         </main>
 
-        {/* ====================================================
-            FEEDBACK OVERLAY (slides up from bottom)
-            ==================================================== */}
+        {/* Immediate Feedback Drawer */}
         <FeedbackOverlay
-          phase={phase}
-          explanation={explanation}
+          phase={state.phase}
+          isCorrect={state.lastAnswerCorrect}
+          explanation={currentQ.explanation}
+          correctAnswerText={getRevealedCorrectAnswerText()}
           onContinue={handleContinue}
         />
 
-        {/* ====================================================
-            WIN MODAL
-            ==================================================== */}
+        {/* Out-of-Hearts Modal */}
         <AnimatePresence>
-          {phase === 'win' && (
-            <WinModal
-              stars={starResult.stars}
-              score={score}
-              onPlayAgain={handleRestart}
-              onBackToLessons={handleBackToLessons}
+          {state.phase === 'OUT_OF_HEARTS' && (
+            <OutOfHeartsModal
+              onStartReview={handleStartReviewMode}
+              onRefillHearts={handleRefillAll}
+              onUpgradePro={handleUpgradeToPro}
+              onClose={() => actions.refillHearts()}
             />
           )}
         </AnimatePresence>
 
-        {/* ====================================================
-            GAME OVER MODAL
-            ==================================================== */}
+        {/* Win Modal */}
         <AnimatePresence>
-          {phase === 'gameover' && (
-            <GameOverModal
-              score={score}
-              onPlayAgain={handleRestart}
+          {state.phase === 'COMPLETED' && (
+            <WinModal
+              stars={starResult.stars}
+              score={state.score}
+              onPlayAgain={() => actions.restartLesson(initialQuestions)}
               onBackToLessons={onExit ?? (() => {})}
             />
           )}
         </AnimatePresence>
 
-        {/* ====================================================
-            DRAG OVERLAY — floating word clone during drag
-            ==================================================== */}
-        <DragOverlay dropAnimation={null}>
-          {activeItem ? <WordBlock word={activeItem.word} variant="overlay" /> : null}
-        </DragOverlay>
+        {/* Game Over Modal */}
+        <AnimatePresence>
+          {heartsState.heartsCount <= 0 && state.phase === 'FEEDBACK' && !state.isReviewMode && (
+            <GameOverModal
+              score={state.score}
+              onPlayAgain={() => actions.restartLesson(initialQuestions)}
+              onBackToLessons={onExit ?? (() => {})}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* DnD Drag Overlay */}
+        {isJumble && (
+          <DragOverlay dropAnimation={null}>
+            {activeItem ? <WordBlock word={activeItem.word} variant="overlay" /> : null}
+          </DragOverlay>
+        )}
       </div>
     </DndContext>
   );
