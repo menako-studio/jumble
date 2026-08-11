@@ -6,16 +6,24 @@
 
 ## ✨ Key Features
 
-- **Interactive Question Types & Pre-Lesson Concept Intros**:
-  - **Concept Walkthrough**: Interactive Brilliant.org-style pre-challenge intro slides featuring formulas, grammar rule breakdowns, audio pronunciations, and warm-up questions.
+- **Brilliant & Duolingo Style Serpentine Pathway (`LessonsPage`)**:
+  - Vertical serpentine map layout with alternating milestone nodes, SVG connecting lines, and unit headers.
+  - **Sequential Lesson Unlocking**: Lessons unlock progressively as preceding challenges are completed with stars.
+  - Active nodes feature pulsing glows, floating mascot badges ("START"), and animated feedback.
+- **Gamified Step-by-Step Intro View (`intro.png`)**:
+  - Pre-challenge concept intro matching `intro.png` with top segmented progress bar, exit `✕` button, heart/star indicators, formula cards, and interactive warm-up slides.
+- **Groq LLM AI Grammar Tutor (`AITutorModal`)**:
+  - Powered by **Groq API** (`llama-3.3-70b-versatile`).
+  - Interactive AI drawer accessible via the bottom-left AI button on intro pages.
+  - Features quick prompt chips, custom Groq API key configuration, and context-aware smart fallback explanations.
+- **Interactive Question Types**:
   - **Word Jumble**: Drag-and-drop or tap-to-select word tiles powered by `@dnd-kit`.
   - **Multiple Choice**: Sleek 3D visual selection cards.
   - **Fill in the Blank**: Sentence completion tasks with real-time feedback.
-- **Comprehensive CEFR Curriculum & Exam Prep**:
-  - Modules categorized across CEFR levels (A1, A2, B1, B2) and specialized Exam Prep (IELTS, TOEFL, TOEIC).
-  - Detailed grammar sub-categories: Tenses, Nouns & Articles, Verbs & Modals, Adjectives & Adverbs, Pronouns & Determiners, Prepositions & Conjunctions, Sentence & Clauses, and Punctuation.
+- **Complete Test-English Reference Curriculum**:
+  - Full syllabus covering all 18 categories from [test-english.com](https://test-english.com/grammar-points/contents/) across CEFR levels A1–B2 (Present Tenses, Past Tenses, Future, Verb Tense Reviews, Modals & Phrasals, Conditionals & Wishes, Passive Voice, Reported Speech, -ing & Infinitive, Articles Nouns & Pronouns, Relative Clauses, There & It, Auxiliary Verbs, Adjectives & Adverbs, Conjunctions & Clauses, Prepositions, Questions, Word Order) plus Pro Exam Suite (IELTS, TOEFL, TOEIC).
 - **Playful Duolingo-Inspired UX & Gamification**:
-  - Vibrant, tactile 3D UI with playful color palettes, glassmorphism cards, and fluid animations.
+  - Vibrant 3D UI with playful color palettes, glassmorphism cards, and fluid animations.
   - **Anytime Heart Refill**: Tap heart counter anytime to open refill modal or launch Out-of-Hearts Review Mode.
   - **Session-Based Star Scoring**: Star rating computed accurately from session mistakes (0 mistakes = 3 stars, 1-2 mistakes = 2 stars, >2 = 1 star).
   - XP multiplier combo streaks and celebratory confetti visual FX.
@@ -31,6 +39,7 @@
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite 8, React Router DOM v7
+- **AI & LLM**: Groq API (`llama-3.3-70b-versatile`)
 - **Styling & UI**: Tailwind CSS v3, Framer Motion, Lucide React, Canvas Confetti
 - **Drag & Drop**: `@dnd-kit/core`, `@dnd-kit/sortable`
 - **Internationalization**: `i18next`, `react-i18next`
@@ -80,4 +89,3 @@
 ## 📄 License
 
 Created by **Menako Studio**.
-
