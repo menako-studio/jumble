@@ -1,26 +1,26 @@
 /**
  * i18n.ts — i18next configuration
- * Supports: Bahasa Indonesia (id) and Japanese (jp)
+ * Supports: English (en) [Default] and Bahasa Indonesia (id)
  */
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import enTranslation from './locales/en/translation.json';
 import idTranslation from './locales/id/translation.json';
-import jpTranslation from './locales/jp/translation.json';
 
 const resources = {
+  en: { translation: enTranslation },
   id: { translation: idTranslation },
-  jp: { translation: jpTranslation },
 };
 
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    // Default language — detect from localStorage or fall back to 'id'
-    lng: (localStorage.getItem('jumble_lang') as 'id' | 'jp') || 'id',
-    fallbackLng: 'id',
+    // Default language — detect from localStorage or fall back to 'en'
+    lng: (localStorage.getItem('jumble_lang') as 'en' | 'id') || 'en',
+    fallbackLng: 'en',
     interpolation: {
       // React already escapes values
       escapeValue: false,

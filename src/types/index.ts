@@ -2,7 +2,21 @@
 // JUMBLE — Shared TypeScript Types
 // ============================================================
 
-export type Country = 'ID' | 'JP';
+export type Language = 'en' | 'id';
+
+export type Country = 'EN' | 'ID';
+
+export type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B1_PLUS' | 'B2';
+
+export type GrammarCategory =
+  | 'tenses'
+  | 'verbs_modals'
+  | 'nouns_pronouns'
+  | 'adjectives_adverbs'
+  | 'clauses_conditionals'
+  | 'passive_reported';
+
+export type QuestionType = 'jumble' | 'multiple_choice' | 'fill_in_blank';
 
 export interface User {
   id: string;
@@ -13,59 +27,95 @@ export interface User {
   current_streak: number;
 }
 
-export interface Lesson {
-  id: string;
-  level: number;
-  topic_name: string;
-  topic_name_id: string;
-  topic_name_jp: string;
+export interface QuestionExplanation {
+  rule: string;
+  rule_id?: string;
+  detailedReason: string;
+  detailedReason_id?: string;
+  commonMistakeNote?: string;
+  commonMistakeNote_id?: string;
+  exampleContext?: string;
 }
 
 export interface Question {
   id: string;
-  lesson_id: string;
-  correct_word_order: string[];
-  jumbled_word_order: string[];
-  explanation_id: string | null;
-  explanation_jp: string | null;
-  display_order: number;
+  lesson_id?: string;
+  type: QuestionType;
+  prompt: string;
+  prompt_id?: string;
+  options?: string[];
+  jumbledOptions?: string[];
+  correctAnswer: string | string[]; // string for MC & Fill-in-blank, string[] for Jumble
+  correct_word_order?: string[];
+  jumbled_word_order?: string[];
+  explanation: QuestionExplanation;
+  explanation_id?: string | null;
+  display_order?: number;
 }
 
-export interface UserProgress {
+export interface GrammarModule {
   id: string;
+  cefrLevel: CEFRLevel;
+  category: GrammarCategory;
+  title: string;
+  title_id?: string;
+  description: string;
+  description_id?: string;
+  questions: Question[];
+  level?: number;
+  topic_name?: string;
+  topic_name_id?: string;
+}
+
+// Aliases for backwards compatibility
+export type GrammarPoint = GrammarModule;
+export type Lesson = GrammarModule;
+
+export interface UserProgress {
+  id?: string;
   user_id: string;
   lesson_id: string;
   stars_earned: number;
-  completed_at: string;
+  completed_at?: string;
 }
 
-// ——— Game State ———
+// ——— Hearts System State ———
+
+export interface HeartsState {
+  heartsCount: number; // max 5
+  lastHeartRestoredAt: number; // Unix timestamp in ms
+  isProUser: boolean;
+}
+
+// ——— Game Machine State ———
 
 export type GamePhase =
-  | 'loading'
-  | 'playing'
-  | 'correct'
-  | 'incorrect'
-  | 'win'
-  | 'gameover';
+  | 'IDLE'
+  | 'PLAYING'
+  | 'FEEDBACK'
+  | 'OUT_OF_HEARTS'
+  | 'COMPLETED';
 
 export interface GameState {
   questions: Question[];
   currentIndex: number;
-  lives: number;          // 0–3
-  combo: number;          // consecutive correct answers
   score: number;
+  combo: number;
   phase: GamePhase;
-  /** Words the user has placed into the answer zone (ordered) */
-  answerWords: string[];
-  /** Words still sitting in the word bank */
-  bankWords: string[];
+  lastAnswerCorrect: boolean | null;
+  isReviewMode: boolean;
+  reviewCorrectCount: number;
+  // Component inputs
+  mcSelected: string | null;
+  fibSelected: string | null;
+  answerItems: WordItem[];
+  bankItems: WordItem[];
 }
 
 // ——— Word item for dnd-kit ———
 
 export interface WordItem {
-  id: string;       // unique id for dnd-kit (word + index to handle duplicates)
+  id: string; // unique id for dnd-kit (word + index to handle duplicates)
   word: string;
-  zone: 'bank' | 'answer';
+  zone?: 'bank' | 'answer';
 }
