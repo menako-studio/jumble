@@ -6,13 +6,52 @@ export default {
   ],
   theme: {
     extend: {
-      // ——— Nunito font (loaded via index.css @import) ———
+      // ——— Nunito & Outfit font ———
       fontFamily: {
         nunito: ['Nunito', 'sans-serif'],
       },
-      // ——— Jumble Brand Palette ———
+      // ——— Duolingo-Inspired Bright & Playful Color Palette ———
       colors: {
-        // Primary — vibrant purple/indigo
+        // Bright Duolingo Green
+        duo: {
+          green: {
+            DEFAULT: '#58cc02',
+            light:   '#79db28',
+            dark:    '#46a302',
+            shadow:  '#3c8d00',
+          },
+          blue: {
+            DEFAULT: '#1cb0f6',
+            light:   '#49c0f8',
+            dark:    '#1899d6',
+            shadow:  '#137eb3',
+          },
+          yellow: {
+            DEFAULT: '#ffc800',
+            light:   '#ffd433',
+            dark:    '#e5b200',
+            shadow:  '#cc9e00',
+          },
+          orange: {
+            DEFAULT: '#ff9600',
+            light:   '#ffab33',
+            dark:    '#e58700',
+            shadow:  '#cc7800',
+          },
+          purple: {
+            DEFAULT: '#ce82ff',
+            light:   '#d99bff',
+            dark:    '#b862fa',
+            shadow:  '#9d42e3',
+          },
+          red: {
+            DEFAULT: '#ff4b4b',
+            light:   '#ff6f6f',
+            dark:    '#ea2b2b',
+            shadow:  '#d11f1f',
+          },
+        },
+        // Legacy Brand Palette
         brand: {
           50:  '#f0f0ff',
           100: '#e2e0ff',
@@ -25,31 +64,27 @@ export default {
           800: '#3f1ea8',
           900: '#341c88',
         },
-        // Accent — warm yellow/orange
         accent: {
           300: '#fde68a',
           400: '#fbbf24',
-          500: '#f59e0b',  // main
+          500: '#f59e0b',
           600: '#d97706',
         },
-        // Success green
         success: {
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
+          400: '#79db28',
+          500: '#58cc02',
+          600: '#46a302',
         },
-        // Error red/coral
         danger: {
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
+          400: '#ff6f6f',
+          500: '#ff4b4b',
+          600: '#ea2b2b',
         },
-        // Background system
         surface: {
-          bg:    '#0f0a1e',   // very dark purple — main bg
-          card:  '#1a1235',   // card bg
-          panel: '#221845',   // panel bg
-          border:'#3d2f7a',   // border
+          bg:    '#131f24',   // playful dark teal/navy base
+          card:  '#1d2d35',   // playful card panel
+          panel: '#263843',   // elevated panel
+          border:'#374e5d',   // stroke
         },
       },
       // ——— Custom Animations ———
@@ -68,13 +103,17 @@ export default {
           '40%':  { transform: 'scale(1.15)' },
           '100%': { transform: 'scale(1)' },
         },
+        bounceMini: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%':      { transform: 'translateY(-4px)' },
+        },
         'float-up': {
           '0%':   { opacity: '1', transform: 'translateY(0)' },
           '100%': { opacity: '0', transform: 'translateY(-48px)' },
         },
         'pulse-glow': {
-          '0%, 100%': { boxShadow: '0 0 0 0 rgba(108, 79, 246, 0.4)' },
-          '50%':       { boxShadow: '0 0 0 12px rgba(108, 79, 246, 0)' },
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(88, 204, 2, 0.4)' },
+          '50%':       { boxShadow: '0 0 0 14px rgba(88, 204, 2, 0)' },
         },
         'spin-slow': {
           from: { transform: 'rotate(0deg)' },
@@ -82,26 +121,26 @@ export default {
         },
       },
       animation: {
-        shake:       'shake 0.5s ease-in-out',
-        pop:         'pop 0.3s ease-out',
-        'float-up':  'float-up 1s ease-out forwards',
-        'pulse-glow':'pulse-glow 2s ease-in-out infinite',
-        'spin-slow': 'spin-slow 8s linear infinite',
+        shake:        'shake 0.5s ease-in-out',
+        pop:          'pop 0.3s ease-out',
+        bounceMini:   'bounceMini 1.5s ease-in-out infinite',
+        'float-up':   'float-up 1s ease-out forwards',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'spin-slow':  'spin-slow 12s linear infinite',
       },
-      // ——— Box Shadows ———
       boxShadow: {
-        'card':   '0 4px 24px rgba(0,0,0,0.35)',
-        'word':   '0 4px 0 rgba(0,0,0,0.35)',
-        'word-sm':'0 2px 0 rgba(0,0,0,0.3)',
-        'glow':   '0 0 24px rgba(108,79,246,0.5)',
-        'success':'0 0 20px rgba(34,197,94,0.4)',
-        'danger': '0 0 20px rgba(239,68,68,0.4)',
+        'card':     '0 6px 24px rgba(0,0,0,0.3)',
+        '3d-green': '0 5px 0 #46a302',
+        '3d-blue':  '0 5px 0 #1899d6',
+        '3d-yellow':'0 5px 0 #e5b200',
+        '3d-purple':'0 5px 0 #b862fa',
+        '3d-red':   '0 5px 0 #ea2b2b',
+        'glow':     '0 0 24px rgba(88, 204, 2, 0.4)',
       },
-      // ——— Border Radius ———
       borderRadius: {
-        'xl2': '1rem',
-        'xl3': '1.5rem',
-        'xl4': '2rem',
+        'xl2': '1.25rem',
+        'xl3': '1.75rem',
+        'xl4': '2.25rem',
       },
     },
   },
