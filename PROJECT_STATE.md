@@ -87,8 +87,16 @@ jumble/
 │   │   └── PlayPage.tsx        # Route wrapper extracting `:id` parameter to launch `JumbleLevel`
 │   ├── types/
 │   │   └── index.ts            # Centralized TypeScript domain interfaces (GrammarCategory, GrammarSubCategory, ConceptIntro)
+│   ├── context/
+│   │   └── AuthContext.tsx         # Google OAuth & persistent guest auth with auto-save & cloud migration
+│   ├── components/
+│   │   ├── profile/
+│   │   │   ├── ProfileModal.tsx        # User profile, statistics, cloud sync status & Google login modal
+│   │   │   └── UserProfileButton.tsx   # Header trigger button with avatar & auto-save sync status dot
+│   │   └── ui/
+│   │       └── HorizontalScroller.tsx  # Smooth horizontal carousel scroller with arrows, wheel & drag support
 │   ├── App.css                 # Custom component animations & extra styles
-│   ├── App.tsx                 # Root router configuration (`/`, `/lessons`, `/play/:id`)
+│   ├── App.tsx                 # Root router configuration (`/`, `/lessons`, `/play/:id`) wrapped in AuthProvider
 │   ├── i18n.ts                 # i18next setup (EN default, ID secondary)
 │   ├── index.css               # Design system tokens, color palettes, playful background gradients, glassmorphism utilities
 │   └── main.tsx                # React root mount point
@@ -98,26 +106,31 @@ jumble/
 
 ## 3. CURRENT IMPLEMENTATION STATE & DATA FLOW
 ### Active Modules & Core Features
-1. **Serpentine Pathway Map (`LessonsPage.tsx`)**:
+1. **Dedicated Landing Page (`HomePage.tsx`)**:
+   - Distinct from the learning dashboard, featuring an engaging hero, animated mascot, curriculum preview, feature pillars, and profile sync widget.
+2. **Serpentine Pathway Map & Pagination (`LessonsPage.tsx`)**:
    - Replaces traditional grid cards with a serpentine zigzag pathway map (`brilliant.png` & Duolingo layout).
    - Alternating offset milestone nodes connected by dashed SVG path lines.
-   - Unit Banners ("Unit 1: Present Tenses", "Unit 2: Past Tenses", etc.).
-   - Sequential Unlocking: Lesson 1 unlocked by default; subsequent lessons unlock upon earning stars in preceding lessons.
-   - Node states: Active (pulsing green glow + floating START mascot), Completed (gold stars rating + checkmark), Locked (🔒 icon + lock requirement toast).
-2. **Gamified Concept Intro (`ConceptIntroWalkthrough.tsx`)**:
-   - Matches `intro.png`: Segmented top progress bar, exit `✕` button, energy/heart & star counters.
-   - Interactive formula cards, rule breakdowns, TTS audio examples, and warm-up questions.
-   - Bottom Action Bar: Groq AI Assistant button on bottom-left, Continue CTA button on bottom-right.
-3. **Groq AI Grammar LLM Assistant (`AITutorModal.tsx` & `groqClient.ts`)**:
-   - Powered by Groq API (`llama-3.3-70b-versatile`).
-   - Custom Groq API Key configuration modal (`localStorage` persistence).
-   - Quick prompt chips ("💡 Simple Explanation", "📝 3 More Examples", "❓ When to Use?", "🇮🇩 In Indonesian").
-   - Contextual smart fallback answers when offline or API key is absent.
-4. **Complete Test-English Reference Curriculum**:
-   - Full 18 Test-English categories plus Exam Prep suite (Present Tenses, Past Tenses, Future, Verb Tense Reviews, Modals & Phrasals, Conditionals & Wishes, Passive Voice, Reported Speech, -ing and Infinitive, Articles Nouns & Pronouns, Relative Clauses, There & It, Auxiliary Verbs, Adjectives & Adverbs, Conjunctions & Clauses, Prepositions, Questions, Word Order, IELTS/TOEFL/TOEIC).
+   - Built-in pagination (`ITEMS_PER_PAGE = 8`) to eliminate infinite scrolling fatigue.
+   - Interactive jump-to-challenge banner directing learners to their active level page.
+3. **Horizontal Category Carousel (`HorizontalScroller.tsx`)**:
+   - Tactile left/right navigation arrow buttons (`‹` and `›`), mouse wheel horizontal translation, grab-and-drag desktop support, and gradient edge masks.
+4. **Auto-Save & Google Authentication (`AuthContext.tsx`, `ProfileModal.tsx`)**:
+   - Supabase Google OAuth integration with persistent local guest fallback.
+   - Automatic background migration of guest progress to Supabase `user_progress` and `users` tables upon sign in.
+   - Real-time auto-save indicator (☁️) ensuring learning progress is never lost on refresh or deployment restarts.
+5. **Gamified Concept Intro (`ConceptIntroWalkthrough.tsx`)**:
+   - Segmented top progress bar, interactive formula cards, TTS audio examples, and warm-up questions.
+   - Fixed exit `✕` button to return to `/lessons` map cleanly rather than unintentionally launching gameplay questions.
+6. **Groq AI Grammar LLM Assistant (`AITutorModal.tsx` & `groqClient.ts`)**:
+   - Powered by Groq API (`llama-3.3-70b-versatile`) with context-aware Indonesian/English prompts.
+7. **Production SPA Routing (`vercel.json`)**:
+   - Clean Vercel rewrite configuration eliminating 404 errors on direct navigation or page refresh for `/lessons` and `/play/:id`.
 
 ---
 
 ## 4. VERIFICATION & BUILD CHECKS
-- TypeScript compiler checks (`tsc -b` / `npx tsc --noEmit`): Clean compilation without errors or warnings.
+- Security Audit (`npm audit`): Clean with `found 0 vulnerabilities` (React Router DOM ^7.18.3, PostCSS ^8.5.28).
+- TypeScript compiler checks (`tsc -b`): Clean compilation without errors or warnings.
 - Vite Production Build (`npm run build`): Successfully outputs minified client bundle.
+- Local Dev Server: Responds with `HTTP/1.1 200 OK` on `/` and `/lessons`.
