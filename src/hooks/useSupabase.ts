@@ -5,7 +5,7 @@
  * background synchronization to Supabase when configured or online.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { GRAMMAR_MODULES } from '../data/grammarModules';
 import type { Lesson, Question, UserProgress } from '../types';
@@ -51,6 +51,7 @@ export function saveLocalProgress(lessonId: string, starsEarned: number, synced 
 
   if (typeof window !== 'undefined') {
     localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(current));
+    window.dispatchEvent(new CustomEvent('jumble_progress_updated'));
   }
   return current;
 }
@@ -171,8 +172,7 @@ export function useUserProgress(userId: string | undefined) {
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Read local progress first for immediate render
+  const loadLocal = useCallback(() => {
     const localData = getLocalProgress();
     const localList: UserProgress[] = Object.values(localData).map((d) => ({
       user_id: userId || 'demo-user',
@@ -181,8 +181,21 @@ export function useUserProgress(userId: string | undefined) {
       completed_at: d.completed_at,
     }));
     setProgress(localList);
+  }, [userId]);
 
-    if (!userId || IS_DEMO) return;
+  useEffect(() => {
+    loadLocal();
+
+    const handleUpdate = () => loadLocal();
+    window.addEventListener('jumble_progress_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    if (!userId || IS_DEMO) {
+      return () => {
+        window.removeEventListener('jumble_progress_updated', handleUpdate);
+        window.removeEventListener('storage', handleUpdate);
+      };
+    }
 
     setLoading(true);
     // Background sync then fetch remote
@@ -198,7 +211,12 @@ export function useUserProgress(userId: string | undefined) {
           setLoading(false);
         });
     });
-  }, [userId]);
+
+    return () => {
+      window.removeEventListener('jumble_progress_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, [userId, loadLocal]);
 
   return { progress, loading };
 }
