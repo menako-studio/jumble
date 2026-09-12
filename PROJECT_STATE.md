@@ -8,7 +8,8 @@
 - **Core Framework**: React 19 (`react` ^19.2.6, `react-dom` ^19.2.6) with TypeScript (`typescript` ~6.0.2).
 - **Build Tool & Bundler**: Vite 8 (`vite` ^8.0.12, `@vitejs/plugin-react` ^6.0.1).
 - **AI & LLM Integration**: Groq API Client (`src/lib/groqClient.ts`) using model `llama-3.3-70b-versatile` with customizable API key storage (`localStorage`) and smart context-aware offline fallbacks.
-- **Styling & Design System**: Tailwind CSS v3 (`tailwindcss` ^3.4.19, `autoprefixer`, `postcss`), custom playful Duolingo-inspired & glassmorphism utilities in `src/index.css`, custom fonts (`Nunito`, `Outfit` loaded via Google Fonts).
+- **Styling & Design System**: Tailwind CSS v3 (`tailwindcss` ^3.4.19, `autoprefixer`, `postcss`). Light, airy Sana Labs × Duolingo design system in `src/index.css` — crisp white/porcelain surfaces (`surface.*` tokens), high-contrast slate `ink.*` typography, tactile `border-2 border-b-4` 3D elevation on buttons/tiles, and pastel mint/coral (`feedback.*`) bottom-sheet drawers. Custom fonts (`Nunito`, `Outfit` loaded via Google Fonts).
+- **Sound Design**: Zero-asset synthesized Web Audio engine (`src/lib/audioEngine.ts` + `src/hooks/useSound.ts`) — ascending chime on correct answers, soft thud on mistakes, tile pop/remove clicks, win flourish. Mute toggle persisted to `localStorage`, exposed in `CardHeader`.
 - **State Machine & Data Layer**: Reducer State Machine (`useGameState`), Resilient Hybrid Data Hook (`useSupabase` with `localStorage` offline fallback and background sync queue).
 - **Zero-Cost Native TTS**: Web Speech API (`window.speechSynthesis`) encapsulated in `src/lib/speech.ts` with `AudioButton.tsx`.
 - **Backend & Database**: Supabase PostgreSQL (`@supabase/supabase-js` ^2.108.1) with client fallback to static dataset (`GRAMMAR_MODULES`).
@@ -24,6 +25,8 @@
 ### Directory Tree & Component Responsibilities
 ```
 jumble/
+├── .claude/
+│   └── launch.json             # Claude Code dev launch configuration (npm run dev on port 5173)
 ├── public/                     # Static assets & public icons
 ├── supabase/
 │   └── schema.sql              # PostgreSQL tables (users, lessons, questions, user_progress), RLS & seed data
@@ -68,10 +71,12 @@ jumble/
 │   │       ├── adjectivesPrepositions.ts
 │   │       └── examPrep.ts
 │   ├── hooks/
-│   │   ├── useConfetti.ts      # Firework & celebratory confetti triggers
+│   │   ├── useConfetti.ts      # Firework & celebratory confetti triggers (Duolingo brand palette)
 │   │   ├── useGameState.ts     # State Machine hook (IDLE, PLAYING, FEEDBACK, OUT_OF_HEARTS, COMPLETED)
+│   │   ├── useSound.ts         # React hook wrapper around the synthesized audio engine + mute state
 │   │   └── useSupabase.ts      # Offline-first data hook with LocalStorage & background sync queue
 │   ├── lib/
+│   │   ├── audioEngine.ts      # Zero-asset Web Audio synth (correct chime, mistake thud, tile pop/remove, win flourish)
 │   │   ├── evaluator.ts        # String normalization & word array matching logic
 │   │   ├── groqClient.ts       # Groq API LLM Client (Llama-3.3-70b-versatile, key storage, smart fallback explanations)
 │   │   ├── heartsManager.ts    # Hearts state management (5 hearts max, 4h auto-refill, localStorage persistence, PRO mode)
@@ -126,6 +131,11 @@ jumble/
    - Powered by Groq API (`llama-3.3-70b-versatile`) with context-aware Indonesian/English prompts.
 7. **Production SPA Routing (`vercel.json`)**:
    - Clean Vercel rewrite configuration eliminating 404 errors on direct navigation or page refresh for `/lessons` and `/play/:id`.
+8. **Light Design System Overhaul (Sana Labs × Duolingo)**:
+   - Full conversion from the legacy dark navy theme to a crisp light theme across all 24 component/page files — white/porcelain surfaces, high-contrast slate typography, tactile `border-b-4` 3D elevation on buttons and word tiles, pastel mint/coral feedback drawers matching the spec exactly.
+   - New `exam` (indigo/violet) accent token for Exam Prep tags, `feedback.*` pastel tokens, progress-bar shimmer sweep animation.
+9. **Synthesized Sound Engine**:
+   - Zero-asset Web Audio cues (ascending chime on correct, soft thud on mistake, tile pop/remove clicks, win flourish) wired into `JumbleLevel`, with a persisted mute toggle in `CardHeader` (lucide `Volume2`/`VolumeX`).
 
 ---
 
@@ -134,3 +144,5 @@ jumble/
 - TypeScript compiler checks (`tsc -b`): Clean compilation without errors or warnings.
 - Vite Production Build (`npm run build`): Successfully outputs minified client bundle.
 - Local Dev Server: Responds with `HTTP/1.1 200 OK` on `/` and `/lessons`.
+- ESLint (`npm run lint`): 13 pre-existing errors (React `set-state-in-effect` patterns, a couple of unused-arg/`any` lints) — unchanged before/after the light-theme + audio overhaul; none introduced by it.
+- Manual visual QA (2026-09-12): Full user journey walked end-to-end in-browser after the light-theme overhaul — Home → Lessons pathway map → Concept Intro walkthrough → Jumble word-tile question → Multiple Choice question → correct-answer feedback drawer → Level Complete modal. All screens render on the new light Sana Labs × Duolingo palette with no dark-theme remnants.
