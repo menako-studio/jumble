@@ -26,7 +26,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
         initial={{ scale: 0.7, opacity: 0, y: 40 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-        className="glass rounded-xl4 p-8 w-full max-w-sm text-center shadow-card"
+        className="bg-white rounded-xl4 p-8 w-full max-w-sm text-center shadow-card-lg border-2 border-slate-100"
         id="gameover-modal-content"
       >
         {/* Broken heart */}
@@ -39,22 +39,22 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
           💔
         </motion.div>
 
-        <h2 className="text-3xl font-black text-white mb-2">
+        <h2 className="text-3xl font-black text-ink-900 mb-2">
           {t('ui.gameover')}
         </h2>
 
-        <p className="text-white/60 font-semibold text-sm mb-6">
+        <p className="text-ink-500 font-semibold text-sm mb-6">
           {t('ui.incorrect')}
         </p>
 
         {/* Score */}
-        <div className="flex items-center justify-center gap-2 mb-6 px-4 py-3 rounded-xl glass-light">
+        <div className="flex items-center justify-center gap-2 mb-6 px-4 py-3 rounded-xl bg-amber-50 border-2 border-amber-100">
           <span className="text-2xl">⚡</span>
           <div className="text-left">
-            <p className="text-white/50 text-xs font-semibold uppercase tracking-wide">
+            <p className="text-amber-700/70 text-xs font-semibold uppercase tracking-wide">
               {t('ui.yourScore')}
             </p>
-            <p className="text-white font-black text-2xl leading-tight">{score.toLocaleString()}</p>
+            <p className="text-amber-700 font-black text-2xl leading-tight">{score.toLocaleString()}</p>
           </div>
         </div>
 

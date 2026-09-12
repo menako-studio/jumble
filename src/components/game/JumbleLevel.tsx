@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useConfetti } from '../../hooks/useConfetti';
 import { useGameState } from '../../hooks/useGameState';
+import { useSound } from '../../hooks/useSound';
 import { calculateStars } from '../../lib/starCalculator';
 import { checkAnswer } from '../../lib/evaluator';
 import {
@@ -68,6 +69,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'id';
   const { fireWin, fireCorrect } = useConfetti();
+  const { playCorrect, playMistake, playTilePop, playTileRemove, playWin } = useSound();
 
   const { state, actions } = useGameState(initialQuestions);
   const [heartsState, setHeartsState] = React.useState<HeartsState>(() => getHeartsState());
@@ -128,6 +130,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveItem(null);
     if (!over) return;
+    playTilePop();
     if (state.answerItems.find((i) => i.id === active.id) && state.answerItems.find((i) => i.id === over.id)) {
       const oldIdx = state.answerItems.findIndex((i) => i.id === active.id);
       const newIdx = state.answerItems.findIndex((i) => i.id === over.id);
@@ -161,10 +164,12 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
     if (isCorrect) {
       const points = 100 * Math.min(state.combo + 1, 5);
       fireCorrect();
+      playCorrect();
       actions.submitAnswer(true, points, false);
     } else {
       setShaking(true);
       setTimeout(() => setShaking(false), 600);
+      playMistake();
 
       let isOut = false;
       if (!state.isReviewMode && !heartsState.isProUser) {
@@ -186,10 +191,12 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
     if (state.phase === 'COMPLETED') {
       const starResult = calculateStars(state.mistakesCount, state.questions.length);
       fireWin();
+      playWin();
       const targetLessonId = lessonId || currentQ?.lesson_id || 'lesson-1';
       saveProgress(user.id, targetLessonId, starResult.stars);
       addUserPoints(user.id, state.score, starResult.stars);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.phase, state.mistakesCount, state.questions.length, state.score, currentQ?.lesson_id, lessonId, user.id, fireWin]);
 
   // Out of hearts modal triggers
@@ -234,7 +241,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   if (!currentQ) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-jumble">
-        <p className="text-white/60 font-black animate-pulse">{t('ui.loading', 'Loading questions...')}</p>
+        <p className="text-ink-500 font-black animate-pulse">{t('ui.loading', 'Loading questions...')}</p>
       </div>
     );
   }
@@ -281,16 +288,16 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
           {/* Top XP Bar & Review Progress */}
           <div className="flex items-center justify-between">
             <motion.div
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-light"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border-2 border-amber-100"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <span className="text-accent-400 text-lg">⚡</span>
-              <span className="text-white font-black text-sm">{state.score.toLocaleString()} XP</span>
+              <span className="text-duo-yellow-dark text-lg">⚡</span>
+              <span className="text-amber-700 font-black text-sm">{state.score.toLocaleString()} XP</span>
             </motion.div>
 
             {state.isReviewMode && (
-              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black">
+              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 text-xs font-black">
                 Review Goal: {state.reviewCorrectCount}/5 Correct
               </span>
             )}
@@ -323,7 +330,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-center justify-center gap-3 text-center"
                 >
-                  <p className="text-white font-black text-lg leading-snug">
+                  <p className="text-ink-900 font-black text-lg leading-snug">
                     {promptText || t('ui.arrangeWords', 'Arrange the words in correct order:')}
                   </p>
                   <AudioButton text={getRevealedCorrectAnswerText()} size="sm" variant="glass" />
@@ -336,15 +343,21 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
                   <AnswerZone
                     items={state.answerItems}
                     variant={state.lastAnswerCorrect === true ? 'correct' : state.lastAnswerCorrect === false ? 'incorrect' : 'answer'}
-                    onWordClick={(id, word) => actions.moveWordToBank(id, word)}
+                    onWordClick={(id, word) => {
+                      playTileRemove();
+                      actions.moveWordToBank(id, word);
+                    }}
                     disabled={state.phase !== 'PLAYING'}
                   />
                 </motion.div>
 
-                <div className="glass rounded-xl2 p-3">
+                <div className="bg-surface-panel rounded-xl2 p-3 border-2 border-surface-border">
                   <WordBank
                     items={state.bankItems}
-                    onWordClick={(id, word) => actions.moveWordToAnswer(id, word)}
+                    onWordClick={(id, word) => {
+                      playTilePop();
+                      actions.moveWordToAnswer(id, word);
+                    }}
                     disabled={state.phase !== 'PLAYING'}
                   />
                 </div>

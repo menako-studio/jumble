@@ -37,12 +37,12 @@ export const AnswerZone: React.FC<AnswerZoneProps> = ({
         'flex flex-wrap gap-2 items-center justify-center',
         'border-2 border-dashed',
         isOver
-          ? 'border-brand-400 bg-brand-900/40 shadow-glow'
+          ? 'border-brand-400 bg-brand-50 shadow-glow'
           : items.length === 0
-          ? 'border-surface-border bg-surface-card/40'
-          : 'border-brand-600/50 bg-surface-card/60',
-        variant === 'correct'   && 'border-success-500/60 bg-success-600/10 shadow-success',
-        variant === 'incorrect' && 'border-danger-500/60 bg-danger-600/10 shadow-danger',
+          ? 'border-surface-border bg-surface-panel'
+          : 'border-brand-300 bg-surface-panel',
+        variant === 'correct'   && 'border-duo-green bg-duo-green/10',
+        variant === 'incorrect' && 'border-duo-red bg-duo-red/10',
       )}
       id="answer-zone"
     >
@@ -51,7 +51,7 @@ export const AnswerZone: React.FC<AnswerZoneProps> = ({
         strategy={horizontalListSortingStrategy}
       >
         {items.length === 0 ? (
-          <p className="text-white/30 text-sm font-medium pointer-events-none select-none">
+          <p className="text-slate-400 text-sm font-medium pointer-events-none select-none">
             {t('ui.dragWords')}
           </p>
         ) : (

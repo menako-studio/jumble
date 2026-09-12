@@ -18,12 +18,12 @@ export const LanguageSwitcher: React.FC = () => {
   return (
     <button
       onClick={toggle}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-light hover:bg-white/15 transition-all duration-200 font-bold text-sm cursor-pointer"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-light hover:bg-slate-100 transition-all duration-200 font-bold text-sm cursor-pointer"
       aria-label="Switch language"
       id="lang-switcher"
     >
       <span className="text-lg">{current === 'en' ? '🇬🇧' : '🇮🇩'}</span>
-      <span className="uppercase text-white/80">{current}</span>
+      <span className="uppercase text-ink-700">{current}</span>
     </button>
   );
 };

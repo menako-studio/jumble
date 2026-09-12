@@ -32,7 +32,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/75 backdrop-blur-md"
+          className="absolute inset-0 bg-ink-900/45 backdrop-blur-md"
         />
 
         {/* Modal Card */}
@@ -40,12 +40,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           initial={{ opacity: 0, scale: 0.92, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 20 }}
-          className="relative z-10 w-full max-w-md bg-[#182329] border-2 border-surface-border rounded-3xl p-6 text-white shadow-2xl overflow-hidden font-nunito"
+          className="relative z-10 w-full max-w-md bg-white border-2 border-surface-border rounded-3xl p-6 text-ink-900 shadow-card-lg overflow-hidden font-nunito"
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center font-black transition-all cursor-pointer"
+            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-ink-700 flex items-center justify-center font-black transition-all cursor-pointer"
           >
             ✕
           </button>
@@ -60,30 +60,30 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   className="w-20 h-20 rounded-full border-4 border-duo-green shadow-glow object-cover"
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-duo-blue to-purple-600 border-4 border-duo-blue-light shadow-3d-blue flex items-center justify-center text-3xl font-black">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-duo-blue to-indigo-500 border-4 border-duo-blue-light shadow-3d-blue flex items-center justify-center text-3xl font-black text-white">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
               )}
-              <span className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-emerald-500 border-2 border-[#182329] flex items-center justify-center text-[10px]" title="Auto-Save Active">
+              <span className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-[10px]" title="Auto-Save Active">
                 ☁️
               </span>
             </div>
 
-            <h3 className="text-xl font-black text-white flex items-center gap-2">
+            <h3 className="text-xl font-black text-ink-900 flex items-center gap-2">
               <span>{user.name}</span>
               {user.isGuest && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold border border-amber-500/30">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-extrabold border border-amber-200">
                   {lang === 'id' ? 'Tamu' : 'Guest'}
                 </span>
               )}
             </h3>
             {user.email && (
-              <p className="text-xs text-white/50 font-semibold">{user.email}</p>
+              <p className="text-xs text-ink-500 font-semibold">{user.email}</p>
             )}
 
             {/* Auto-Save & Cloud Sync Status Badge */}
-            <div className="mt-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="mt-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>
                 {syncStatus === 'saving'
                   ? (lang === 'id' ? 'Menyimpan progress...' : 'Saving progress...')
@@ -94,18 +94,18 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           {/* Stats Overview */}
           <div className="grid grid-cols-2 gap-3 mb-6">
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
+            <div className="p-3.5 rounded-2xl bg-surface-panel border border-surface-border text-center">
               <span className="text-2xl block mb-1">⭐</span>
-              <span className="text-xl font-black text-amber-400">{totalStars}</span>
-              <span className="text-[11px] font-bold text-white/50 block">
+              <span className="text-xl font-black text-amber-500">{totalStars}</span>
+              <span className="text-[11px] font-bold text-ink-500 block">
                 {lang === 'id' ? 'Total Bintang' : 'Total Stars'}
               </span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
+            <div className="p-3.5 rounded-2xl bg-surface-panel border border-surface-border text-center">
               <span className="text-2xl block mb-1">🏆</span>
-              <span className="text-xl font-black text-duo-green-light">{completedLessonsCount}</span>
-              <span className="text-[11px] font-bold text-white/50 block">
+              <span className="text-xl font-black text-duo-green-dark">{completedLessonsCount}</span>
+              <span className="text-[11px] font-bold text-ink-500 block">
                 {lang === 'id' ? 'Lesson Selesai' : 'Completed'}
               </span>
             </div>
@@ -114,7 +114,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           {/* Google Auth CTA or Account Management */}
           {user.isGuest ? (
             <div className="flex flex-col gap-3">
-              <div className="p-3 rounded-2xl bg-duo-blue/10 border border-duo-blue/30 text-xs text-white/80 leading-relaxed">
+              <div className="p-3 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-ink-700 leading-relaxed">
                 💡 {lang === 'id'
                   ? 'Masuk dengan Google agar progress belajar kamu otomatis tersinkronisasi di semua perangkat dan tidak hilang di jumble.vercel!'
                   : 'Sign in with Google to keep your learning progress permanently synchronized across devices and production deployments!'}
@@ -125,7 +125,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   await signInWithGoogle();
                   onClose();
                 }}
-                className="w-full py-3.5 px-4 rounded-2xl bg-white text-gray-900 hover:bg-gray-100 font-black text-sm flex items-center justify-center gap-3 transition-all cursor-pointer shadow-lg active:scale-98"
+                className="w-full py-3.5 px-4 rounded-2xl bg-white text-gray-900 hover:bg-gray-50 border-2 border-slate-200 font-black text-sm flex items-center justify-center gap-3 transition-all cursor-pointer shadow-sm active:scale-98"
                 id="google-signin-btn"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               </button>
 
               {!isConfigured && (
-                <span className="text-[10px] text-center text-white/40">
+                <span className="text-[10px] text-center text-ink-400">
                   (Demo environment: simulates instant sign-in while preserving progress)
                 </span>
               )}
@@ -164,7 +164,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   await signOut();
                   onClose();
                 }}
-                className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10 border-red-500/20"
+                className="w-full text-duo-red hover:text-duo-red-dark hover:bg-red-50 border-red-200"
               >
                 {lang === 'id' ? 'Keluar Akun' : 'Sign Out'}
               </Button>

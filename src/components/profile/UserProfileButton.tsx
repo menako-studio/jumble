@@ -18,7 +18,7 @@ export const UserProfileButton: React.FC<UserProfileButtonProps> = ({
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-surface-card hover:bg-white/10 border-2 border-surface-border transition-all cursor-pointer shadow-sm group"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white hover:bg-slate-50 border-2 border-surface-border transition-all cursor-pointer shadow-sm group"
         title="View Profile & Progress Sync"
         id="user-profile-btn"
       >
@@ -35,17 +35,17 @@ export const UserProfileButton: React.FC<UserProfileButtonProps> = ({
             </div>
           )}
           <span
-            className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-[#182329]"
+            className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white"
             title="Auto-saved"
           />
         </div>
 
-        <span className="text-xs font-bold text-white max-w-[90px] truncate hidden sm:inline-block">
+        <span className="text-xs font-bold text-ink-900 max-w-[90px] truncate hidden sm:inline-block">
           {user.name}
         </span>
 
         {user.isGuest ? (
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-50 text-amber-700 border border-amber-200">
             Guest
           </span>
         ) : (

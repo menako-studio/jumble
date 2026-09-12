@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900;1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900;1000&family=Outfit:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================
-   JUMBLE — Playful Duolingo-Inspired Global Design System
+   JUMBLE — Light, Airy Sana Labs × Duolingo Design System
    ============================================================ */
 
 @layer base {
@@ -14,7 +14,7 @@
   }
 
   html, body {
-    @apply bg-surface-bg text-white;
+    @apply bg-white text-ink-900;
     font-family: 'Nunito', sans-serif;
     min-height: 100dvh;
     overflow-x: hidden;
@@ -32,78 +32,68 @@
 }
 
 /* ============================================================
-   Background System — Vibrant Dark Gradient
+   Background System — Crisp, Vibrant Light Canvas
    ============================================================ */
 .bg-jumble {
   background:
-    radial-gradient(circle at 15% 20%, rgba(88, 204, 2, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 85% 15%, rgba(28, 176, 246, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 50% 85%, rgba(206, 130, 255, 0.1) 0%, transparent 50%),
-    #131f24;
+    radial-gradient(circle at 15% 20%, rgba(88, 204, 2, 0.08) 0%, transparent 42%),
+    radial-gradient(circle at 85% 15%, rgba(28, 176, 246, 0.08) 0%, transparent 42%),
+    radial-gradient(circle at 50% 90%, rgba(255, 150, 0, 0.06) 0%, transparent 50%),
+    #f7f7f8;
 }
 
 /* ============================================================
-   Glassmorphism & Playful Cards
+   Glassmorphism & Playful Cards (light)
    ============================================================ */
 .glass {
-  background: rgba(29, 45, 53, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 2px solid #374e5d;
+  border: 1.5px solid #e2e8f0;
 }
 
 .glass-light {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.035);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(15, 23, 42, 0.06);
 }
 
 .duo-card {
-  @apply rounded-3xl bg-surface-card border-2 border-surface-border p-5 transition-all duration-200;
-  box-shadow: 0 6px 0 #131f24;
+  @apply rounded-3xl bg-white border-2 border-b-4 border-surface-border p-5 transition-all duration-200;
 }
 
 .duo-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 0 #131f24;
+  @apply border-slate-300 shadow-card-lg;
 }
 
 /* ============================================================
-   Word Blocks & DnD Tile System
+   Word Blocks & DnD Tile System — Tactile 3D Chips
    ============================================================ */
 .word-block {
   @apply inline-flex items-center justify-center px-4 py-3 rounded-2xl font-extrabold text-lg
-         cursor-grab select-none transition-all duration-150;
-  box-shadow: 0 5px 0 #131f24;
+         cursor-grab select-none transition-all duration-150
+         bg-white text-ink-900 border-2 border-b-4 border-slate-200;
   touch-action: none;
 }
 
 .word-block:active {
   cursor: grabbing;
-  transform: translateY(3px) scale(1.04);
-  box-shadow: 0 2px 0 #131f24;
-}
-
-.word-block--bank {
-  @apply bg-surface-panel text-white border-2 border-surface-border;
+  transform: translateY(2px);
+  @apply border-b-2;
 }
 
 .word-block--bank:hover {
-  @apply bg-duo-blue-dark border-duo-blue;
-  box-shadow: 0 5px 0 theme('colors.duo.blue.shadow'), 0 0 16px rgba(28, 176, 246, 0.35);
-  transform: translateY(-2px);
+  @apply bg-sky-50 border-duo-blue-light text-duo-blue-dark;
 }
 
 .word-block--answer {
-  @apply bg-duo-blue text-white border-2 border-duo-blue-light;
-  box-shadow: 0 5px 0 theme('colors.duo.blue.shadow');
+  @apply bg-sky-50 text-duo-blue-dark border-duo-blue-light;
 }
 
 .word-block--answer:hover {
-  @apply bg-duo-blue-light;
-  box-shadow: 0 5px 0 theme('colors.duo.blue.shadow'), 0 0 16px rgba(28, 176, 246, 0.45);
-  transform: translateY(-2px);
+  @apply bg-sky-100;
 }
 
 .word-block--dragging {
@@ -111,8 +101,8 @@
 }
 
 .word-block--overlay {
-  @apply bg-duo-blue text-white border-2 border-white;
-  box-shadow: 0 10px 24px rgba(28, 176, 246, 0.6), 0 5px 0 theme('colors.duo.blue.shadow');
+  @apply bg-white text-duo-blue-dark border-2 border-b-4 border-duo-blue;
+  box-shadow: 0 10px 24px rgba(28, 176, 246, 0.25);
   transform: scale(1.08) rotate(-1.5deg);
   cursor: grabbing;
 }
@@ -121,57 +111,49 @@
    Correct / Incorrect Answer States
    ============================================================ */
 .word-block--correct {
-  @apply bg-duo-green text-white border-2 border-duo-green-light !important;
-  box-shadow: 0 5px 0 theme('colors.duo.green.shadow'), 0 0 18px rgba(88, 204, 2, 0.5) !important;
+  @apply bg-duo-green text-white border-2 border-b-4 border-duo-green-shadow !important;
   animation: pop 0.3s ease-out;
 }
 
 .word-block--incorrect {
-  @apply bg-duo-red text-white border-2 border-duo-red-light !important;
-  box-shadow: 0 5px 0 theme('colors.duo.red.shadow'), 0 0 18px rgba(255, 75, 75, 0.5) !important;
+  @apply bg-duo-red text-white border-2 border-b-4 border-duo-red-shadow !important;
 }
 
 /* ============================================================
-   Duolingo-Inspired 3D Tactile Button System
+   Duolingo-Inspired 3D Tactile Button System (light)
    ============================================================ */
 .btn {
   @apply inline-flex items-center justify-center gap-2 rounded-2xl font-black uppercase tracking-wide
-         transition-all duration-100 select-none cursor-pointer border-2;
-  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.4);
+         transition-all duration-100 select-none cursor-pointer border-2 border-b-4;
 }
 
 .btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(3px);
+  @apply border-b-2 !important;
 }
 
 .btn-primary {
-  @apply btn bg-duo-blue border-duo-blue-light hover:bg-duo-blue-dark text-white px-8 py-3.5 text-lg;
-  box-shadow: 0 5px 0 theme('colors.duo.blue.shadow');
+  @apply btn bg-duo-blue border-duo-blue-shadow hover:bg-duo-blue-dark text-white px-8 py-3.5 text-lg;
 }
 
 .btn-success {
-  @apply btn bg-duo-green border-duo-green-light hover:bg-duo-green-dark text-white px-8 py-3.5 text-lg;
-  box-shadow: 0 5px 0 theme('colors.duo.green.shadow');
+  @apply btn bg-duo-green border-duo-green-shadow hover:bg-duo-green-dark text-white px-8 py-3.5 text-lg;
 }
 
 .btn-danger {
-  @apply btn bg-duo-red border-duo-red-light hover:bg-duo-red-dark text-white px-8 py-3.5 text-lg;
-  box-shadow: 0 5px 0 theme('colors.duo.red.shadow');
+  @apply btn bg-duo-red border-duo-red-shadow hover:bg-duo-red-dark text-white px-8 py-3.5 text-lg;
 }
 
 .btn-warning {
-  @apply btn bg-duo-yellow border-duo-yellow-light hover:bg-duo-yellow-dark text-amber-950 px-8 py-3.5 text-lg;
-  box-shadow: 0 5px 0 theme('colors.duo.yellow.shadow');
+  @apply btn bg-duo-yellow border-duo-yellow-shadow hover:bg-duo-yellow-dark text-amber-950 px-8 py-3.5 text-lg;
 }
 
 .btn-sm {
-  @apply px-4 py-2 text-sm rounded-xl;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+  @apply px-4 py-2 text-sm rounded-xl border-b-[3px];
 }
 
 .btn-ghost {
-  @apply btn bg-transparent hover:bg-white/10 text-white/70 hover:text-white border-transparent px-5 py-2.5 text-base;
+  @apply btn bg-transparent hover:bg-slate-100 text-ink-500 hover:text-ink-900 border-transparent px-5 py-2.5 text-base;
   box-shadow: none !important;
 }
 .btn-ghost:active {
@@ -180,17 +162,24 @@
 }
 
 /* ============================================================
-   Progress Bar
+   Progress Bar — animated fill with shimmer sweep
    ============================================================ */
 .progress-track {
-  @apply h-3.5 rounded-full overflow-hidden border border-white/10;
-  background: rgba(255, 255, 255, 0.08);
+  @apply h-3.5 rounded-full overflow-hidden border border-slate-200 bg-slate-100;
 }
 
 .progress-fill {
-  @apply h-full rounded-full transition-all duration-500 ease-out;
+  @apply h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden;
   background: linear-gradient(90deg, #58cc02, #79db28);
-  box-shadow: 0 0 10px rgba(88, 204, 2, 0.6);
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  @apply animate-shimmer;
 }
 
 /* ============================================================
@@ -198,8 +187,21 @@
    ============================================================ */
 .modal-overlay {
   @apply fixed inset-0 z-50 flex items-center justify-center p-4;
-  background: rgba(19, 31, 36, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+/* ============================================================
+   Feedback Bottom Sheet — pastel mint / coral drawers
+   ============================================================ */
+.feedback-drawer--correct {
+  background: linear-gradient(180deg, #eaffd6 0%, #d7ffb8 100%);
+  border-top: 2px solid #9ae562;
+}
+
+.feedback-drawer--incorrect {
+  background: linear-gradient(180deg, #ffecec 0%, #ffdfe0 100%);
+  border-top: 2px solid #ffb3b5;
 }
 
 /* ============================================================
@@ -247,5 +249,5 @@
 /* Scrollbars */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(55, 78, 93, 0.8); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(88, 204, 2, 0.8); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

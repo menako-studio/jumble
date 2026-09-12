@@ -17,12 +17,12 @@ export const HomePage: React.FC = () => {
   const completedLessons = progress.filter((p) => p.stars_earned > 0).length;
 
   return (
-    <div className="bg-jumble min-h-dvh flex flex-col font-nunito text-white overflow-x-hidden">
+    <div className="bg-jumble min-h-dvh flex flex-col font-nunito text-ink-900 overflow-x-hidden">
       {/* Dynamic Background Ambient Lighting */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-duo-green/15 blur-3xl" />
-        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-duo-blue/15 blur-3xl" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] rounded-full bg-duo-purple/10 blur-3xl" />
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-duo-green/10 blur-3xl" />
+        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-duo-blue/10 blur-3xl" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] rounded-full bg-duo-purple/8 blur-3xl" />
       </div>
 
       {/* Modern Sticky Navigation Bar */}
@@ -43,21 +43,21 @@ export const HomePage: React.FC = () => {
               >
                 Jumble
               </span>
-              <span className="hidden sm:inline-block ml-2 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="hidden sm:inline-block ml-2 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                 Grammar AI
               </span>
             </div>
           </Link>
 
           {/* Quick Nav Anchor Links (Desktop) */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-white/75">
-            <a href="#features" className="hover:text-white transition-colors">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-ink-500">
+            <a href="#features" className="hover:text-ink-900 transition-colors">
               {lang === 'id' ? 'Fitur' : 'Features'}
             </a>
-            <a href="#curriculum" className="hover:text-white transition-colors">
+            <a href="#curriculum" className="hover:text-ink-900 transition-colors">
               {lang === 'id' ? 'Kurikulum' : 'Curriculum'}
             </a>
-            <a href="#exam-prep" className="hover:text-white transition-colors">
+            <a href="#exam-prep" className="hover:text-ink-900 transition-colors">
               {lang === 'id' ? 'Ujian' : 'Exam Prep'}
             </a>
           </nav>
@@ -73,7 +73,7 @@ export const HomePage: React.FC = () => {
             {/* Open Lessons Button */}
             <Link
               to="/lessons"
-              className="px-4 py-2 rounded-2xl bg-duo-green hover:bg-duo-green-light text-white font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-3d-green transition-all cursor-pointer"
+              className="px-4 py-2 rounded-2xl bg-duo-green hover:bg-duo-green-dark text-white font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-3d-green transition-all cursor-pointer"
               id="header-lessons-cta"
             >
               <span>{lang === 'id' ? 'Buka Belajar' : 'Lessons'}</span>
@@ -98,7 +98,7 @@ export const HomePage: React.FC = () => {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl sm:text-6xl md:text-7xl font-black mb-4 leading-[1.08] tracking-tight max-w-4xl"
+          className="text-4xl sm:text-6xl md:text-7xl font-black mb-4 leading-[1.08] tracking-tight max-w-4xl text-ink-900"
         >
           {lang === 'id' ? (
             <>
@@ -138,7 +138,7 @@ export const HomePage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-white/80 text-base sm:text-lg md:text-xl font-semibold mb-8 leading-relaxed max-w-2xl"
+          className="text-ink-500 text-base sm:text-lg md:text-xl font-semibold mb-8 leading-relaxed max-w-2xl"
         >
           {lang === 'id'
             ? 'Belajar tata bahasa Inggris interaktif dengan panduan konsep ala Brilliant, tantangan kartu gamifikasi ala Duolingo, dan AI Grammar Tutor cerdas (Groq Llama 3.3). CEFR A1–B2 & Persiapan IELTS/TOEFL.'
@@ -154,7 +154,7 @@ export const HomePage: React.FC = () => {
         >
           <Link
             to="/lessons"
-            className="btn-success btn text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3 font-black shadow-3d-green hover:scale-105 transition-transform"
+            className="btn-success btn text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3 font-black hover:scale-105 transition-transform"
             id="hero-start-btn"
           >
             <span>{completedLessons > 0 ? (lang === 'id' ? 'Lanjutkan Belajar' : 'Continue Learning') : t('ui.startLearning', 'Start Learning')}</span>
@@ -163,16 +163,16 @@ export const HomePage: React.FC = () => {
         </motion.div>
 
         {/* Quick Highlights Strip */}
-        <div className="flex flex-wrap justify-center gap-3 text-xs font-bold text-white/70">
-          <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+        <div className="flex flex-wrap justify-center gap-3 text-xs font-bold text-ink-500">
+          <span className="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm flex items-center gap-1.5">
             <span>✨</span>
             <span>18+ Categories & 50+ Lessons</span>
           </span>
-          <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+          <span className="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm flex items-center gap-1.5">
             <span>⚡</span>
             <span>Groq Llama 3.3 AI Tutor</span>
           </span>
-          <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+          <span className="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm flex items-center gap-1.5">
             <span>☁️</span>
             <span>Zero-Loss Auto-Save & Cloud Sync</span>
           </span>
@@ -182,10 +182,10 @@ export const HomePage: React.FC = () => {
       {/* Feature Pillars Section */}
       <section id="features" className="relative z-10 max-w-6xl mx-auto px-4 py-16 w-full">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">
+          <h2 className="text-3xl sm:text-4xl font-black text-ink-900 mb-2">
             {lang === 'id' ? 'Dirancang untuk Pemahaman Cepat' : 'Built for Frictionless Mastery'}
           </h2>
-          <p className="text-white/60 font-semibold text-sm max-w-lg mx-auto">
+          <p className="text-ink-500 font-semibold text-sm max-w-lg mx-auto">
             {lang === 'id'
               ? 'Kombinasi metode visual, penjelasan interaktif, dan tutor AI cerdas.'
               : 'Combining visual concept intros, serpentine milestone unlocks, and instant AI tutor assistance.'}
@@ -194,14 +194,14 @@ export const HomePage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Feature 1 */}
-          <div className="p-6 rounded-3xl bg-surface-card/70 border-2 border-surface-border flex flex-col gap-3 shadow-lg">
-            <div className="w-12 h-12 rounded-2xl bg-duo-green/20 text-duo-green-light border border-duo-green/30 text-2xl flex items-center justify-center font-black">
+          <div className="p-6 rounded-3xl bg-white border-2 border-surface-border flex flex-col gap-3 shadow-card">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-duo-green-dark border border-emerald-200 text-2xl flex items-center justify-center font-black">
               🏁
             </div>
-            <h3 className="text-xl font-black text-white">
+            <h3 className="text-xl font-black text-ink-900">
               {lang === 'id' ? 'Peta Belajar Serpentine' : 'Serpentine Pathway Map'}
             </h3>
-            <p className="text-sm text-white/70 font-semibold leading-relaxed">
+            <p className="text-sm text-ink-500 font-semibold leading-relaxed">
               {lang === 'id'
                 ? 'Peta berliku dengan milestone berurutan. Setiap lesson baru terbuka saat kamu berhasil mengumpulkan bintang di tantangan sebelumnya.'
                 : 'Zigzagging pathway with progressive milestone unlocking and star ratings, keeping you focused without overwhelming choices.'}
@@ -209,14 +209,14 @@ export const HomePage: React.FC = () => {
           </div>
 
           {/* Feature 2 */}
-          <div className="p-6 rounded-3xl bg-surface-card/70 border-2 border-surface-border flex flex-col gap-3 shadow-lg">
-            <div className="w-12 h-12 rounded-2xl bg-duo-blue/20 text-duo-blue-light border border-duo-blue/30 text-2xl flex items-center justify-center font-black">
+          <div className="p-6 rounded-3xl bg-white border-2 border-surface-border flex flex-col gap-3 shadow-card">
+            <div className="w-12 h-12 rounded-2xl bg-sky-50 text-duo-blue-dark border border-sky-200 text-2xl flex items-center justify-center font-black">
               💡
             </div>
-            <h3 className="text-xl font-black text-white">
+            <h3 className="text-xl font-black text-ink-900">
               {lang === 'id' ? 'Intro Konsep Interaktif' : 'Brilliant-Style Intros'}
             </h3>
-            <p className="text-sm text-white/70 font-semibold leading-relaxed">
+            <p className="text-sm text-ink-500 font-semibold leading-relaxed">
               {lang === 'id'
                 ? 'Pelajari rumus, pola aturan, dan contoh suara sebelum memulai kuis. Tidak perlu menghafal rumus abstrak tanpa konteks.'
                 : 'Step-by-step formula breakdowns, native TTS audio examples, and warm-up checks before jumping into the word tiles.'}
@@ -224,14 +224,14 @@ export const HomePage: React.FC = () => {
           </div>
 
           {/* Feature 3 */}
-          <div className="p-6 rounded-3xl bg-surface-card/70 border-2 border-surface-border flex flex-col gap-3 shadow-lg">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/30 text-2xl flex items-center justify-center font-black">
+          <div className="p-6 rounded-3xl bg-white border-2 border-surface-border flex flex-col gap-3 shadow-card">
+            <div className="w-12 h-12 rounded-2xl bg-exam/10 text-exam-dark border border-exam/20 text-2xl flex items-center justify-center font-black">
               ⚡
             </div>
-            <h3 className="text-xl font-black text-white">
+            <h3 className="text-xl font-black text-ink-900">
               {lang === 'id' ? 'Groq AI Grammar Tutor' : 'Groq AI Grammar Tutor'}
             </h3>
-            <p className="text-sm text-white/70 font-semibold leading-relaxed">
+            <p className="text-sm text-ink-500 font-semibold leading-relaxed">
               {lang === 'id'
                 ? 'Tanyakan apa saja langsung ke AI Tutor berbasis Llama 3.3. Dapatkan penjelasan alternatif dan contoh tambahan dalam bahasa Indonesia.'
                 : 'Stuck on a tricky rule? Ask Groq Llama 3.3 for simple analogies, extra examples, or Indonesian explanations on the fly.'}
@@ -241,15 +241,15 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Curriculum Showcase Section */}
-      <section id="curriculum" className="relative z-10 max-w-6xl mx-auto px-4 py-16 w-full border-t border-white/10">
+      <section id="curriculum" className="relative z-10 max-w-6xl mx-auto px-4 py-16 w-full border-t border-surface-border">
         <div className="text-center mb-10">
-          <span className="text-xs font-black uppercase tracking-widest text-duo-blue-light px-3 py-1 rounded-full bg-duo-blue/10 border border-duo-blue/20">
+          <span className="text-xs font-black uppercase tracking-widest text-duo-blue-dark px-3 py-1 rounded-full bg-sky-50 border border-sky-200">
             Curriculum Standard
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-white mt-3 mb-2">
+          <h2 className="text-3xl sm:text-4xl font-black text-ink-900 mt-3 mb-2">
             CEFR Levels & Exam Modules
           </h2>
-          <p className="text-white/60 font-semibold text-sm max-w-md mx-auto">
+          <p className="text-ink-500 font-semibold text-sm max-w-md mx-auto">
             From A1 Elementary fundamentals to Advanced B2 nuance and official exam preparation.
           </p>
         </div>
@@ -266,15 +266,15 @@ export const HomePage: React.FC = () => {
             <Link
               key={c.level}
               to="/lessons"
-              className="p-4 rounded-2xl bg-surface-card border-2 border-surface-border hover:border-white/40 transition-all flex flex-col items-center text-center group cursor-pointer"
+              className="p-4 rounded-2xl bg-white border-2 border-surface-border hover:border-slate-300 hover:shadow-card transition-all flex flex-col items-center text-center group cursor-pointer"
             >
               <div
                 className={`w-10 h-10 rounded-xl bg-gradient-to-tr ${c.color} text-white font-black text-sm flex items-center justify-center shadow-md mb-2 group-hover:scale-110 transition-transform`}
               >
                 {c.isExam ? '👑' : c.level}
               </div>
-              <span className="font-black text-sm text-white">{c.level}</span>
-              <span className="text-[10px] text-white/50 font-semibold mt-0.5">{c.label}</span>
+              <span className="font-black text-sm text-ink-900">{c.level}</span>
+              <span className="text-[10px] text-ink-400 font-semibold mt-0.5">{c.label}</span>
             </Link>
           ))}
         </div>
@@ -292,20 +292,20 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-white/10 bg-[#10191e] py-8 text-center text-xs text-white/50 font-semibold">
+      <footer className="mt-auto border-t border-surface-border bg-surface-canvas py-8 text-center text-xs text-ink-500 font-semibold">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span>🧩</span>
-            <span className="font-bold text-white/70">Jumble by Menako Studio</span>
+            <span className="font-bold text-ink-700">Jumble by Menako Studio</span>
             <span>•</span>
             <span>English Grammar Engine</span>
           </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/lessons" className="hover:text-white transition-colors">
+            <Link to="/lessons" className="hover:text-ink-900 transition-colors">
               {lang === 'id' ? 'Peta Belajar' : 'Lessons Map'}
             </Link>
-            <span className="text-white/20">|</span>
+            <span className="text-slate-300">|</span>
             <span>Auto-Save & Google Auth Ready</span>
           </div>
         </div>

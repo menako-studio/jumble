@@ -21,14 +21,14 @@ export const FillInBlankQuestion: React.FC<FillInBlankQuestionProps> = ({
     const parts = prompt.split('_____');
     if (parts.length < 2) {
       return (
-        <p className="text-white font-black text-xl leading-relaxed">
+        <p className="text-ink-900 font-black text-xl leading-relaxed">
           {prompt}
         </p>
       );
     }
 
     return (
-      <div className="text-white font-black text-xl leading-relaxed flex flex-wrap items-center justify-center gap-2">
+      <div className="text-ink-900 font-black text-xl leading-relaxed flex flex-wrap items-center justify-center gap-2">
         <span>{parts[0]}</span>
         <motion.span
           key={selectedAnswer || 'blank'}
@@ -37,8 +37,8 @@ export const FillInBlankQuestion: React.FC<FillInBlankQuestionProps> = ({
           className={`
             px-4 py-1.5 rounded-xl border-2 font-black text-lg min-w-28 text-center transition-all inline-block
             ${selectedAnswer
-              ? 'bg-brand-500/30 border-brand-400 text-brand-200 shadow-glow'
-              : 'bg-white/10 border-dashed border-white/30 text-white/40'
+              ? 'bg-sky-50 border-duo-blue text-duo-blue-dark'
+              : 'bg-slate-50 border-dashed border-slate-300 text-ink-400'
             }
           `}
         >
@@ -52,16 +52,16 @@ export const FillInBlankQuestion: React.FC<FillInBlankQuestionProps> = ({
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Target Sentence Card */}
-      <div className="glass rounded-xl3 p-6 border border-white/10 shadow-glow text-center min-h-36 flex flex-col justify-center items-center">
-        <p className="text-white/60 text-xs font-black uppercase tracking-widest mb-3">
+      <div className="bg-white rounded-xl3 p-6 border-2 border-b-4 border-surface-border shadow-card text-center min-h-36 flex flex-col justify-center items-center">
+        <p className="text-ink-500 text-xs font-black uppercase tracking-widest mb-3">
           Fill in the Blank
         </p>
         {renderSentenceWithBlank()}
       </div>
 
       {/* Option Chips Bank */}
-      <div className="glass rounded-xl2 p-4 border border-surface-border">
-        <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-3 text-center">
+      <div className="bg-surface-panel rounded-xl2 p-4 border-2 border-surface-border">
+        <p className="text-ink-500 text-xs font-bold uppercase tracking-wider mb-3 text-center">
           Tap the correct word to fill the gap:
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -76,12 +76,12 @@ export const FillInBlankQuestion: React.FC<FillInBlankQuestionProps> = ({
                 onClick={() => !disabled && onSelect(opt)}
                 disabled={disabled}
                 className={`
-                  px-5 py-3 rounded-xl2 font-black text-base transition-all duration-150 border-2
+                  px-5 py-3 rounded-xl2 font-black text-base transition-all duration-150 border-2 border-b-4
                   ${isSelected
-                    ? 'bg-brand-500 border-brand-300 text-white scale-105 shadow-glow'
-                    : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
+                    ? 'bg-duo-blue border-duo-blue-shadow text-white scale-105'
+                    : 'bg-white hover:bg-slate-50 border-slate-200 text-ink-900'
                   }
-                  ${disabled ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}
+                  ${disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer active:translate-y-0.5 active:border-b-2'}
                 `}
                 id={`fib-option-${idx}`}
               >

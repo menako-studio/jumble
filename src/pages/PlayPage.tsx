@@ -27,7 +27,7 @@ export const PlayPage: React.FC = () => {
       <div className="bg-jumble min-h-dvh flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">🧩</div>
-          <p className="text-white/50 font-semibold animate-pulse">{t('ui.loading', 'Loading lesson...')}</p>
+          <p className="text-ink-500 font-semibold animate-pulse">{t('ui.loading', 'Loading lesson...')}</p>
         </div>
       </div>
     );
@@ -38,7 +38,7 @@ export const PlayPage: React.FC = () => {
       <div className="bg-jumble min-h-dvh flex items-center justify-center px-4">
         <div className="glass rounded-xl3 p-8 text-center max-w-sm">
           <p className="text-4xl mb-4">😅</p>
-          <p className="text-white font-bold mb-4">{t('ui.errorLoading', 'Could not load questions.')}</p>
+          <p className="text-ink-900 font-bold mb-4">{t('ui.errorLoading', 'Could not load questions.')}</p>
           <button onClick={() => navigate('/lessons')} className="btn-primary btn btn-sm font-black cursor-pointer">
             {t('ui.backToLessons', 'Back to Lessons')}
           </button>

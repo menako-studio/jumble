@@ -51,6 +51,13 @@ export default {
             shadow:  '#d11f1f',
           },
         },
+        // Pastel feedback drawers (bottom sheet)
+        feedback: {
+          mint:     '#d7ffb8',
+          mintText: '#1a6000',
+          coral:    '#ffdfe0',
+          coralText:'#ea2b2b',
+        },
         // Legacy Brand Palette
         brand: {
           50:  '#f0f0ff',
@@ -80,11 +87,27 @@ export default {
           500: '#ff4b4b',
           600: '#ea2b2b',
         },
+        // Exam Prep tag accent — crisp violet/indigo
+        exam: {
+          DEFAULT: '#6366f1',
+          light:   '#818cf8',
+          dark:    '#4f46e5',
+        },
+        // ——— Light, airy Sana-Labs-meets-Duolingo surfaces ———
         surface: {
-          bg:    '#131f24',   // playful dark teal/navy base
-          card:  '#1d2d35',   // playful card panel
-          panel: '#263843',   // elevated panel
-          border:'#374e5d',   // stroke
+          bg:     '#ffffff',  // crisp clean canvas
+          canvas: '#f7f7f8',  // porcelain secondary canvas
+          card:   '#ffffff',  // card panels
+          panel:  '#f8fafc',  // nested elevated panel
+          stone:  '#f5f5f4',  // warm stone container
+          border: '#e2e8f0',  // clean light divider/border
+        },
+        // ——— High-contrast slate ink typography ———
+        ink: {
+          900: '#0f172a',
+          700: '#1e293b',
+          500: '#64748b',
+          400: '#94a3b8',
         },
       },
       // ——— Custom Animations ———
@@ -119,6 +142,10 @@ export default {
           from: { transform: 'rotate(0deg)' },
           to:   { transform: 'rotate(360deg)' },
         },
+        shimmer: {
+          '0%':   { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(250%)' },
+        },
       },
       animation: {
         shake:        'shake 0.5s ease-in-out',
@@ -127,15 +154,18 @@ export default {
         'float-up':   'float-up 1s ease-out forwards',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
         'spin-slow':  'spin-slow 12s linear infinite',
+        shimmer:      'shimmer 1.8s ease-in-out infinite',
       },
       boxShadow: {
-        'card':     '0 6px 24px rgba(0,0,0,0.3)',
-        '3d-green': '0 5px 0 #46a302',
-        '3d-blue':  '0 5px 0 #1899d6',
-        '3d-yellow':'0 5px 0 #e5b200',
-        '3d-purple':'0 5px 0 #b862fa',
-        '3d-red':   '0 5px 0 #ea2b2b',
-        'glow':     '0 0 24px rgba(88, 204, 2, 0.4)',
+        'card':     '0 2px 12px rgba(15, 23, 42, 0.06)',
+        'card-lg':  '0 8px 30px rgba(15, 23, 42, 0.08)',
+        '3d-green': '0 4px 0 #46a302',
+        '3d-blue':  '0 4px 0 #1899d6',
+        '3d-yellow':'0 4px 0 #e5b200',
+        '3d-purple':'0 4px 0 #b862fa',
+        '3d-red':   '0 4px 0 #ea2b2b',
+        '3d-slate': '0 4px 0 #cbd5e1',
+        'glow':     '0 0 24px rgba(88, 204, 2, 0.25)',
       },
       borderRadius: {
         'xl2': '1.25rem',

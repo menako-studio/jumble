@@ -69,7 +69,7 @@ export const HorizontalScroller: React.FC<HorizontalScrollerProps> = ({ children
       {canScrollLeft && (
         <button
           onClick={() => scrollBy(-240)}
-          className="absolute left-0 z-20 w-8 h-8 rounded-full bg-[#182329]/90 border border-white/20 hover:bg-white/20 text-white flex items-center justify-center font-black text-sm shadow-xl transition-all cursor-pointer backdrop-blur-sm -translate-x-1"
+          className="absolute left-0 z-20 w-8 h-8 rounded-full bg-white border-2 border-slate-200 hover:bg-slate-50 text-ink-700 flex items-center justify-center font-black text-sm shadow-card transition-all cursor-pointer -translate-x-1"
           aria-label="Scroll left"
         >
           ‹
@@ -78,7 +78,7 @@ export const HorizontalScroller: React.FC<HorizontalScrollerProps> = ({ children
 
       {/* Left Gradient Fade Mask */}
       {canScrollLeft && (
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#131f24] to-transparent pointer-events-none z-10" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
       )}
 
       {/* Scrollable Container */}
@@ -99,14 +99,14 @@ export const HorizontalScroller: React.FC<HorizontalScrollerProps> = ({ children
 
       {/* Right Gradient Fade Mask */}
       {canScrollRight && (
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#131f24] to-transparent pointer-events-none z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
       )}
 
       {/* Right Arrow Button */}
       {canScrollRight && (
         <button
           onClick={() => scrollBy(240)}
-          className="absolute right-0 z-20 w-8 h-8 rounded-full bg-[#182329]/90 border border-white/20 hover:bg-white/20 text-white flex items-center justify-center font-black text-sm shadow-xl transition-all cursor-pointer backdrop-blur-sm translate-x-1"
+          className="absolute right-0 z-20 w-8 h-8 rounded-full bg-white border-2 border-slate-200 hover:bg-slate-50 text-ink-700 flex items-center justify-center font-black text-sm shadow-card transition-all cursor-pointer translate-x-1"
           aria-label="Scroll right"
         >
           ›

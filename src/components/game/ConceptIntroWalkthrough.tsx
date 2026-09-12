@@ -66,18 +66,18 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
     warmupSelected && warmup && warmupSelected.trim().toLowerCase() === warmup.correctAnswer.trim().toLowerCase();
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#121214] font-nunito text-white overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-jumble font-nunito text-ink-900 overflow-hidden">
       {/* Dynamic Background Subtle Ambient Glows */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-duo-blue/8 rounded-full blur-3xl" />
       </div>
 
       {/* TOP HEADER (Matching intro.png: Close btn left, Segmented progress bar, Hearts/Stars right) */}
-      <header className="px-4 py-3 border-b border-white/10 flex items-center justify-between gap-4 max-w-5xl mx-auto w-full z-20">
+      <header className="px-4 py-3 border-b border-surface-border bg-white/80 backdrop-blur-sm flex items-center justify-between gap-4 max-w-5xl mx-auto w-full z-20">
         {/* Left: Close Button (✕) */}
         <button
           onClick={onClose || onSkip || onStartChallenge}
-          className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-all cursor-pointer text-lg"
+          className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-ink-700 font-bold flex items-center justify-center transition-all cursor-pointer text-lg"
           title={lang === 'id' ? 'Kembali ke Lessons' : 'Exit to Lessons'}
           id="exit-intro-btn"
         >
@@ -85,7 +85,7 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
         </button>
 
         {/* Center: Segmented Progress Bar */}
-        <div className="flex-1 max-w-xs md:max-w-md flex items-center gap-1.5 h-2.5 bg-white/10 rounded-full p-0.5 overflow-hidden">
+        <div className="flex-1 max-w-xs md:max-w-md flex items-center gap-1.5 h-2.5 bg-slate-100 rounded-full p-0.5 overflow-hidden">
           {slides.map((_, idx) => {
             const isCompleted = idx < currentSlideIndex;
             const isCurrent = idx === currentSlideIndex;
@@ -94,10 +94,10 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
                 key={idx}
                 className={`h-full flex-1 rounded-full transition-all duration-300 ${
                   isCurrent
-                    ? 'bg-emerald-400 shadow-glow scale-y-110'
+                    ? 'bg-duo-green shadow-glow scale-y-110'
                     : isCompleted
-                    ? 'bg-emerald-600'
-                    : 'bg-white/20'
+                    ? 'bg-duo-green-dark'
+                    : 'bg-slate-200'
                 }`}
               />
             );
@@ -106,11 +106,11 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
 
         {/* Right: Hearts & Stars Indicator */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 border border-white/10 text-xs font-black">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-panel border border-surface-border text-xs font-black text-ink-900">
             <span>{heartsState.isProUser ? '♾️' : '❤️'}</span>
             <span>{heartsState.isProUser ? 'PRO' : `${heartsState.heartsCount}/${MAX_HEARTS}`}</span>
           </div>
-          <div className="flex items-center gap-1 text-amber-400 font-black text-xs">
+          <div className="flex items-center gap-1 text-duo-yellow-dark font-black text-xs">
             <span>⚡</span>
             <span>{cefrLevel ? cefrLevel.replace('_PLUS', '+') : 'A1'}</span>
           </div>
@@ -130,17 +130,17 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
           >
             {/* Title Header */}
             <div>
-              <span className="text-emerald-400 text-xs font-black uppercase tracking-widest block mb-1">
+              <span className="text-duo-green-dark text-xs font-black uppercase tracking-widest block mb-1">
                 {lessonTitle} • STEP {currentSlideIndex + 1} OF {slides.length}
               </span>
-              <h1 className="text-2xl md:text-4xl font-black text-white leading-tight">
+              <h1 className="text-2xl md:text-4xl font-black text-ink-900 leading-tight">
                 {title}
               </h1>
 
               {currentSlide.formula && (
-                <div className="mt-4 px-4 py-3 rounded-2xl bg-gradient-to-r from-brand-600/30 via-purple-600/30 to-sky-600/30 border border-brand-400/40 shadow-inner flex items-center justify-between gap-3">
-                  <span className="text-xs text-amber-300 font-black uppercase tracking-wider">Formula</span>
-                  <code className="text-white font-mono font-black text-sm md:text-base tracking-wide">
+                <div className="mt-4 px-4 py-3 rounded-2xl bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 border-2 border-duo-blue/20 flex items-center justify-between gap-3">
+                  <span className="text-xs text-duo-orange-dark font-black uppercase tracking-wider">Formula</span>
+                  <code className="text-ink-900 font-mono font-black text-sm md:text-base tracking-wide">
                     {currentSlide.formula}
                   </code>
                 </div>
@@ -148,23 +148,23 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
             </div>
 
             {/* Explanation Body */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 text-white/90 text-sm md:text-base font-medium leading-relaxed shadow-sm">
+            <div className="p-5 rounded-2xl bg-white border-2 border-surface-border text-ink-700 text-sm md:text-base font-medium leading-relaxed shadow-card">
               {ruleExplanation}
             </div>
 
             {/* Key Examples with Audio */}
             {examples && examples.length > 0 && (
               <div className="flex flex-col gap-3">
-                <span className="text-white/60 text-xs font-black uppercase tracking-wider">
+                <span className="text-ink-500 text-xs font-black uppercase tracking-wider">
                   {t('ui.keyExamples', 'Key Examples')}
                 </span>
                 <div className="grid grid-cols-1 gap-2">
                   {examples.map((ex, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-2xl bg-surface-panel/80 border border-surface-border flex items-center justify-between gap-3 group hover:border-emerald-500/40 transition-colors"
+                      className="p-3.5 rounded-2xl bg-surface-panel border border-surface-border flex items-center justify-between gap-3 group hover:border-emerald-300 transition-colors"
                     >
-                      <p className="text-white font-bold text-sm md:text-base">{ex}</p>
+                      <p className="text-ink-900 font-bold text-sm md:text-base">{ex}</p>
                       <AudioButton text={ex} size="sm" variant="glass" />
                     </div>
                   ))}
@@ -174,15 +174,15 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
 
             {/* Brilliant.org Interactive Micro Warm-up Card */}
             {warmup && (
-              <div className="p-5 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col gap-4 shadow-lg">
+              <div className="p-5 rounded-3xl bg-emerald-50 border-2 border-emerald-200 flex flex-col gap-4 shadow-card">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">🎯</span>
-                  <span className="text-emerald-400 text-xs font-black uppercase tracking-wider">
+                  <span className="text-emerald-700 text-xs font-black uppercase tracking-wider">
                     Interactive Warm-up
                   </span>
                 </div>
 
-                <p className="text-white font-black text-base md:text-lg">
+                <p className="text-ink-900 font-black text-base md:text-lg">
                   {lang === 'id' && warmup.prompt_id ? warmup.prompt_id : warmup.prompt}
                 </p>
 
@@ -191,15 +191,15 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
                     const isSelected = warmupSelected === opt;
                     const isCorrectOption = opt.trim().toLowerCase() === warmup.correctAnswer.trim().toLowerCase();
 
-                    let btnStyle = 'bg-white/10 text-white hover:bg-white/20 border-white/10';
+                    let btnStyle = 'bg-white text-ink-900 hover:bg-slate-50 border-slate-200';
                     if (warmupChecked) {
                       if (isCorrectOption) {
-                        btnStyle = 'bg-emerald-500 text-white border-emerald-400 font-black shadow-glow scale-[1.01]';
+                        btnStyle = 'bg-duo-green text-white border-duo-green-shadow font-black scale-[1.01]';
                       } else if (isSelected) {
-                        btnStyle = 'bg-rose-500 text-white border-rose-400 font-black';
+                        btnStyle = 'bg-duo-red text-white border-duo-red-shadow font-black';
                       }
                     } else if (isSelected) {
-                      btnStyle = 'bg-duo-blue text-white border-duo-blue-light font-black shadow-3d-blue scale-[1.01]';
+                      btnStyle = 'bg-duo-blue text-white border-duo-blue-shadow font-black shadow-3d-blue scale-[1.01]';
                     }
 
                     return (
@@ -207,7 +207,7 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
                         key={i}
                         disabled={warmupChecked}
                         onClick={() => setWarmupSelected(opt)}
-                        className={`p-4 rounded-2xl border text-sm font-bold text-left transition-all cursor-pointer ${btnStyle}`}
+                        className={`p-4 rounded-2xl border-2 text-sm font-bold text-left transition-all cursor-pointer ${btnStyle}`}
                       >
                         {opt}
                       </button>
@@ -219,7 +219,7 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
                   <button
                     disabled={!warmupSelected}
                     onClick={() => setWarmupChecked(true)}
-                    className="self-end px-5 py-2.5 rounded-xl text-xs font-black bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-white transition-all cursor-pointer shadow-md"
+                    className="self-end px-5 py-2.5 rounded-xl text-xs font-black bg-duo-green hover:bg-duo-green-dark disabled:opacity-40 text-white transition-all cursor-pointer shadow-md"
                   >
                     Check Understanding
                   </button>
@@ -228,7 +228,7 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`p-4 rounded-2xl text-xs md:text-sm font-bold ${
-                      isWarmupCorrect ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      isWarmupCorrect ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'
                     }`}
                   >
                     {isWarmupCorrect ? '✨ Spot on! ' : '💡 Explanation: '}
@@ -242,12 +242,12 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
       </main>
 
       {/* BOTTOM ACTION BAR (Matching intro.png: AI Tutor Button Bottom-Left, Action CTA Bottom-Right) */}
-      <footer className="p-4 bg-[#18181c] border-t border-white/10 z-20">
+      <footer className="p-4 bg-white border-t border-surface-border z-20">
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
           {/* Bottom Left: Groq AI Assistant LLM Button */}
           <button
             onClick={() => setIsAiModalOpen(true)}
-            className="px-4 py-3 rounded-2xl bg-gradient-to-r from-duo-blue to-purple-600 hover:from-duo-blue-light hover:to-purple-500 text-white font-black text-xs md:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-glow animate-pulse-glow"
+            className="px-4 py-3 rounded-2xl bg-gradient-to-r from-duo-blue to-indigo-500 hover:from-duo-blue-dark hover:to-indigo-600 text-white font-black text-xs md:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-glow"
             id="open-ai-tutor-btn"
           >
             <span className="text-base">⚡</span>

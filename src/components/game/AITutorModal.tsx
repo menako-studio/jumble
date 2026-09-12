@@ -116,28 +116,28 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md font-nunito">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/45 backdrop-blur-md font-nunito">
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
-            className="w-full max-w-lg bg-surface-card border border-surface-border rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[600px] max-h-[85vh] relative"
+            className="w-full max-w-lg bg-white border-2 border-surface-border rounded-3xl shadow-card-lg overflow-hidden flex flex-col h-[600px] max-h-[85vh] relative"
             id="ai-tutor-modal"
           >
             {/* Modal Header */}
-            <div className="p-4 bg-gradient-to-r from-duo-blue/40 via-purple-600/40 to-emerald-600/40 border-b border-surface-border flex items-center justify-between">
+            <div className="p-4 bg-gradient-to-r from-sky-50 via-indigo-50 to-emerald-50 border-b border-surface-border flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-duo-blue text-white flex items-center justify-center text-xl font-black shadow-glow animate-pulse-glow">
+                <div className="w-10 h-10 rounded-2xl bg-duo-blue text-white flex items-center justify-center text-xl font-black shadow-glow">
                   ⚡
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-white font-black text-base">Groq AI Grammar Tutor</h3>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-400 text-emerald-950 uppercase tracking-wide">
+                    <h3 className="text-ink-900 font-black text-base">Groq AI Grammar Tutor</h3>
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-duo-green text-white uppercase tracking-wide">
                       LLM
                     </span>
                   </div>
-                  <p className="text-white/60 text-xs truncate max-w-[200px]">
+                  <p className="text-ink-500 text-xs truncate max-w-[200px]">
                     {lessonTitle}
                   </p>
                 </div>
@@ -146,7 +146,7 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowSettings(!showSettings)}
-                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 text-xs font-bold transition-all cursor-pointer"
+                  className="p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-ink-700 text-xs font-bold transition-all cursor-pointer"
                   title="Groq API Settings"
                   id="groq-settings-btn"
                 >
@@ -154,7 +154,7 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
                 </button>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-ink-700 font-bold flex items-center justify-center transition-all cursor-pointer"
                   id="close-ai-tutor-btn"
                 >
                   ✕
@@ -171,13 +171,13 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
                 className="p-4 bg-surface-panel border-b border-surface-border flex flex-col gap-2 shrink-0"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-white">Groq API Key (Optional)</span>
+                  <span className="text-xs font-black text-ink-900">Groq API Key (Optional)</span>
                   {apiKeySaved && (
-                    <span className="text-[10px] text-emerald-400 font-bold">Saved!</span>
+                    <span className="text-[10px] text-emerald-600 font-bold">Saved!</span>
                   )}
                 </div>
-                <p className="text-[11px] text-white/60">
-                  Enter your Groq API Key (<code className="text-amber-300">gsk_...</code>) for live Llama-3.3-70b AI answers. Leave empty for instant pre-built fallbacks.
+                <p className="text-[11px] text-ink-500">
+                  Enter your Groq API Key (<code className="text-duo-orange-dark">gsk_...</code>) for live Llama-3.3-70b AI answers. Leave empty for instant pre-built fallbacks.
                 </p>
                 <div className="flex gap-2">
                   <input
@@ -185,11 +185,11 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
                     placeholder="gsk_..."
-                    className="flex-1 px-3 py-1.5 rounded-xl bg-black/40 border border-white/15 text-white text-xs focus:outline-none focus:border-duo-blue"
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-ink-900 text-xs focus:outline-none focus:border-duo-blue"
                   />
                   <button
                     onClick={handleSaveApiKey}
-                    className="px-3 py-1.5 rounded-xl bg-duo-blue text-white font-bold text-xs hover:bg-duo-blue-light cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-duo-blue text-white font-bold text-xs hover:bg-duo-blue-dark cursor-pointer"
                   >
                     Save
                   </button>
@@ -198,7 +198,7 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
             )}
 
             {/* Messages Body */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 no-scrollbar">
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 no-scrollbar bg-surface-canvas">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -210,17 +210,17 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
                     className={`max-w-[85%] p-3.5 rounded-2xl text-xs md:text-sm font-medium leading-relaxed shadow-sm ${
                       msg.sender === 'user'
                         ? 'bg-duo-blue text-white rounded-br-none'
-                        : 'bg-white/10 text-white border border-white/10 rounded-bl-none'
+                        : 'bg-white text-ink-900 border border-surface-border rounded-bl-none'
                     }`}
                   >
                     <div className="whitespace-pre-wrap">{msg.text}</div>
                   </div>
-                  <span className="text-[9px] text-white/40 mt-1 px-1">{msg.timestamp}</span>
+                  <span className="text-[9px] text-ink-400 mt-1 px-1">{msg.timestamp}</span>
                 </div>
               ))}
 
               {isLoading && (
-                <div className="flex items-center gap-2 text-xs text-white/60 p-2 animate-pulse">
+                <div className="flex items-center gap-2 text-xs text-ink-500 p-2 animate-pulse">
                   <span className="text-base">⚡</span>
                   <span>Groq AI is thinking...</span>
                 </div>
@@ -228,12 +228,12 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
             </div>
 
             {/* Quick Prompts */}
-            <div className="p-2 border-t border-white/10 bg-black/20 flex gap-2 overflow-x-auto no-scrollbar shrink-0">
+            <div className="p-2 border-t border-surface-border bg-white flex gap-2 overflow-x-auto no-scrollbar shrink-0">
               {quickPrompts.map((qp, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSend(qp.prompt)}
-                  className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 text-white/90 border border-white/10 text-[11px] font-bold shrink-0 transition-all cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-ink-700 border border-slate-200 text-[11px] font-bold shrink-0 transition-all cursor-pointer"
                 >
                   {qp.label}
                 </button>
@@ -246,7 +246,7 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
                 e.preventDefault();
                 handleSend();
               }}
-              className="p-3 bg-surface-card border-t border-surface-border flex items-center gap-2 shrink-0"
+              className="p-3 bg-white border-t border-surface-border flex items-center gap-2 shrink-0"
             >
               <input
                 type="text"
@@ -255,13 +255,13 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
                 placeholder={
                   lang === 'id' ? 'Tanyakan tentang materi ini...' : 'Ask anything about this lesson...'
                 }
-                className="flex-1 px-4 py-2.5 rounded-2xl bg-black/40 border border-white/15 text-white text-xs md:text-sm focus:outline-none focus:border-duo-blue placeholder:text-white/40"
+                className="flex-1 px-4 py-2.5 rounded-2xl bg-surface-panel border border-slate-200 text-ink-900 text-xs md:text-sm focus:outline-none focus:border-duo-blue placeholder:text-ink-400"
                 id="ai-tutor-input"
               />
               <button
                 type="submit"
                 disabled={!inputQuery.trim() || isLoading}
-                className="w-10 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-white font-black flex items-center justify-center transition-all cursor-pointer shadow-md"
+                className="w-10 h-10 rounded-2xl bg-duo-green hover:bg-duo-green-dark disabled:opacity-40 text-white font-black flex items-center justify-center transition-all cursor-pointer shadow-md"
                 id="ai-tutor-send-btn"
               >
                 ➔

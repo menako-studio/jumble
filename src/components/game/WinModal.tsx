@@ -45,7 +45,7 @@ export const WinModal: React.FC<WinModalProps> = ({
               left: '50%',
               top: '50%',
               transform: `translate(-50%, -50%)`,
-              border: '2px solid rgba(108,79,246,0.5)',
+              border: '2px solid rgba(88,204,2,0.4)',
               animationDuration: `${8 + i * 3}s`,
               animationDirection: i % 2 === 0 ? 'normal' : 'reverse',
             }}
@@ -57,7 +57,7 @@ export const WinModal: React.FC<WinModalProps> = ({
         initial={{ scale: 0.7, opacity: 0, y: 40 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-        className="glass rounded-xl4 p-8 w-full max-w-sm relative z-10 text-center shadow-card"
+        className="bg-white rounded-xl4 p-8 w-full max-w-sm relative z-10 text-center shadow-card-lg border-2 border-slate-100"
         id="win-modal-content"
       >
         {/* Trophy */}
@@ -75,7 +75,7 @@ export const WinModal: React.FC<WinModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-3xl font-black text-white mb-1"
+          className="text-3xl font-black text-ink-900 mb-1"
         >
           {t('ui.levelclear')}
         </motion.h2>
@@ -90,7 +90,7 @@ export const WinModal: React.FC<WinModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-white/70 font-semibold text-base mb-4"
+          className="text-ink-500 font-semibold text-base mb-4"
         >
           {msg}
         </motion.p>
@@ -100,14 +100,14 @@ export const WinModal: React.FC<WinModalProps> = ({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.6 }}
-          className="flex items-center justify-center gap-2 mb-6 px-4 py-3 rounded-xl glass-light"
+          className="flex items-center justify-center gap-2 mb-6 px-4 py-3 rounded-xl bg-amber-50 border-2 border-amber-100"
         >
           <span className="text-2xl">⚡</span>
           <div className="text-left">
-            <p className="text-white/50 text-xs font-semibold uppercase tracking-wide">
+            <p className="text-amber-700/70 text-xs font-semibold uppercase tracking-wide">
               {t('ui.yourScore')}
             </p>
-            <p className="text-white font-black text-2xl leading-tight">{score.toLocaleString()}</p>
+            <p className="text-amber-700 font-black text-2xl leading-tight">{score.toLocaleString()}</p>
           </div>
         </motion.div>
 

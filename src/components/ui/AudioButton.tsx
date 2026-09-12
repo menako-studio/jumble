@@ -39,9 +39,9 @@ export const AudioButton: React.FC<AudioButtonProps> = ({
   }[size];
 
   const variantClasses = {
-    ghost: 'bg-white/10 hover:bg-white/20 text-white',
-    glass: 'glass hover:bg-white/20 text-sky-300 border border-sky-400/30',
-    accent: 'bg-accent-400 hover:bg-accent-300 text-amber-950 shadow-glow font-black',
+    ghost: 'bg-slate-100 hover:bg-slate-200 text-ink-700',
+    glass: 'bg-sky-50 hover:bg-sky-100 text-duo-blue-dark border border-sky-200',
+    accent: 'bg-duo-yellow hover:bg-duo-yellow-dark text-amber-950 font-black',
   }[variant];
 
   return (

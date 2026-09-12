@@ -139,7 +139,7 @@ export const LessonsPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-jumble min-h-dvh flex flex-col font-nunito text-white pb-16 relative">
+    <div className="bg-jumble min-h-dvh flex flex-col font-nunito text-ink-900 pb-16 relative">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -155,22 +155,22 @@ export const LessonsPage: React.FC = () => {
       </AnimatePresence>
 
       {/* Sticky Top Header */}
-      <header className="glass border-b border-surface-border sticky top-0 z-30 shadow-md">
+      <header className="glass border-b border-surface-border sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/')}
-              className="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-all cursor-pointer border border-white/10"
+              className="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 text-ink-700 font-bold flex items-center justify-center transition-all cursor-pointer border border-surface-border"
               id="back-home-btn"
               title="Back to Landing Page"
             >
               ←
             </button>
             <div>
-              <h1 className="text-xl font-black text-white leading-tight">
+              <h1 className="text-xl font-black text-ink-900 leading-tight">
                 {t('ui.lessonSelect', 'Grammar Pathway')}
               </h1>
-              <p className="text-white/50 text-xs font-semibold hidden sm:block">
+              <p className="text-ink-500 text-xs font-semibold hidden sm:block">
                 Brilliant & Duolingo Style Unlocking Map
               </p>
             </div>
@@ -183,7 +183,7 @@ export const LessonsPage: React.FC = () => {
             {/* Hearts Counter */}
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-surface-panel border border-surface-border shadow-sm">
               <span className="text-lg">{heartsState.isProUser ? '♾️' : '❤️'}</span>
-              <span className="text-white font-black text-sm">
+              <span className="text-ink-900 font-black text-sm">
                 {heartsState.isProUser ? 'PRO' : `${heartsState.heartsCount}/${MAX_HEARTS}`}
               </span>
             </div>
@@ -205,8 +205,8 @@ export const LessonsPage: React.FC = () => {
                     px-4 py-1.5 rounded-2xl font-black text-xs shrink-0 transition-all flex flex-col items-center cursor-pointer border-2
                     ${
                       isActive
-                        ? 'bg-duo-blue text-white border-duo-blue-light shadow-3d-blue scale-105'
-                        : 'bg-white/5 text-white/70 hover:bg-white/10 border-transparent'
+                        ? 'bg-duo-blue text-white border-duo-blue-shadow shadow-3d-blue scale-105'
+                        : 'bg-slate-50 text-ink-500 hover:bg-slate-100 border-transparent'
                     }
                   `}
                   id={`cefr-tab-${tab.id}`}
@@ -223,22 +223,22 @@ export const LessonsPage: React.FC = () => {
       {/* Main Content Area */}
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-6 flex flex-col gap-6">
         {/* Course Progress Banner */}
-        <div className="p-5 rounded-3xl bg-gradient-to-r from-duo-blue/30 via-purple-600/30 to-emerald-600/30 border border-white/15 shadow-glow flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="p-5 rounded-3xl bg-gradient-to-r from-sky-50 via-indigo-50 to-emerald-50 border-2 border-white shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-duo-yellow text-amber-950 font-black text-2xl flex items-center justify-center shadow-lg">
               🏆
             </div>
             <div>
-              <h2 className="text-lg font-black text-white">Course Pathway Progress</h2>
-              <p className="text-xs text-white/70 font-semibold mt-0.5">
+              <h2 className="text-lg font-black text-ink-900">Course Pathway Progress</h2>
+              <p className="text-xs text-ink-500 font-semibold mt-0.5">
                 {totalCompleted} of {filteredLessons.length} Lessons Unlocked • ⭐ {totalStars} Total Stars
               </p>
             </div>
           </div>
 
-          <div className="w-full md:w-48 h-3 bg-black/40 rounded-full overflow-hidden p-0.5 border border-white/10">
+          <div className="w-full md:w-48 h-3 bg-white rounded-full overflow-hidden p-0.5 border border-slate-200">
             <div
-              className="h-full bg-emerald-400 rounded-full transition-all duration-500 shadow-glow"
+              className="h-full bg-duo-green rounded-full transition-all duration-500"
               style={{
                 width: `${
                   filteredLessons.length > 0 ? (totalCompleted / filteredLessons.length) * 100 : 0
@@ -250,9 +250,9 @@ export const LessonsPage: React.FC = () => {
 
         {/* Main Category Pills with Enhanced Horizontal Scroller */}
         <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between text-xs text-white/60 font-bold px-1">
+          <div className="flex items-center justify-between text-xs text-ink-500 font-bold px-1">
             <span>{lang === 'id' ? 'Kategori Tata Bahasa' : 'Grammar Categories'}</span>
-            <span className="text-[11px] text-white/40 hidden sm:inline">
+            <span className="text-[11px] text-ink-400 hidden sm:inline">
               {lang === 'id' ? 'Geser atau klik tombol panah ‹ ›' : 'Scroll or use arrows ‹ ›'}
             </span>
           </div>
@@ -265,8 +265,8 @@ export const LessonsPage: React.FC = () => {
               }}
               className={`px-4 py-2 rounded-2xl text-xs font-black shrink-0 transition-all cursor-pointer border-2 ${
                 selectedCategory === 'ALL'
-                  ? 'bg-duo-yellow text-amber-950 border-duo-yellow-light shadow-3d-yellow font-black'
-                  : 'bg-white/5 text-white/80 hover:bg-white/10 border-white/10'
+                  ? 'bg-duo-yellow text-amber-950 border-duo-yellow-shadow shadow-3d-yellow font-black'
+                  : 'bg-slate-50 text-ink-700 hover:bg-slate-100 border-transparent'
               }`}
             >
               🌟 All Categories
@@ -283,8 +283,8 @@ export const LessonsPage: React.FC = () => {
                   }}
                   className={`px-4 py-2 rounded-2xl text-xs font-black shrink-0 transition-all flex items-center gap-2 cursor-pointer border-2 ${
                     isActive
-                      ? 'bg-duo-yellow text-amber-950 border-duo-yellow-light shadow-3d-yellow font-black'
-                      : 'bg-white/5 text-white/80 hover:bg-white/10 border-white/10'
+                      ? 'bg-duo-yellow text-amber-950 border-duo-yellow-shadow shadow-3d-yellow font-black'
+                      : 'bg-slate-50 text-ink-700 hover:bg-slate-100 border-transparent'
                   }`}
                 >
                   <span>{catObj.icon}</span>
@@ -297,8 +297,8 @@ export const LessonsPage: React.FC = () => {
 
         {/* Connected Sub-Category Pills */}
         {activeCategoryMeta && activeCategoryMeta.subCategories.length > 0 && (
-          <div className="p-4 rounded-3xl bg-surface-card/60 border border-surface-border flex flex-col gap-2.5">
-            <span className="text-xs text-white/50 font-black uppercase tracking-wider">
+          <div className="p-4 rounded-3xl bg-surface-panel border border-surface-border flex flex-col gap-2.5">
+            <span className="text-xs text-ink-500 font-black uppercase tracking-wider">
               {lang === 'id' ? 'Sub-Kategori Terkoneksi' : 'Connected Sub-Categories'}:
             </span>
             <HorizontalScroller>
@@ -307,7 +307,7 @@ export const LessonsPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
                   selectedSubCategory === 'ALL'
                     ? 'bg-duo-blue text-white font-black'
-                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                    : 'bg-white text-ink-500 hover:bg-slate-100 border border-slate-200'
                 }`}
               >
                 All Sub-Categories
@@ -322,7 +322,7 @@ export const LessonsPage: React.FC = () => {
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
                       isSubActive
                         ? 'bg-duo-blue text-white font-black shadow-sm'
-                        : 'bg-white/10 text-white/70 hover:bg-white/20'
+                        : 'bg-white text-ink-500 hover:bg-slate-100 border border-slate-200'
                     }`}
                   >
                     {subName}
@@ -335,8 +335,8 @@ export const LessonsPage: React.FC = () => {
 
         {/* Jump to Active Challenge Banner when on another page */}
         {totalPages > 1 && currentPage !== activeLessonPage && (
-          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30">
-            <div className="flex items-center gap-2 text-xs text-emerald-300 font-bold">
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-200">
+            <div className="flex items-center gap-2 text-xs text-emerald-700 font-bold">
               <span>🚀</span>
               <span>
                 {lang === 'id'
@@ -346,7 +346,7 @@ export const LessonsPage: React.FC = () => {
             </div>
             <button
               onClick={() => handlePageChange(activeLessonPage)}
-              className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black text-xs transition-all cursor-pointer shadow-md"
+              className="px-3 py-1.5 rounded-xl bg-duo-green hover:bg-duo-green-dark text-white font-black text-xs transition-all cursor-pointer shadow-md"
             >
               {lang === 'id' ? 'Lompat ke Sana →' : 'Jump There →'}
             </button>
@@ -356,15 +356,15 @@ export const LessonsPage: React.FC = () => {
         {/* SERPENTINE PATHWAY MAP (Matching brilliant.png & Duolingo) */}
         {loading ? (
           <div className="flex items-center justify-center h-40">
-            <div className="text-white/40 font-semibold animate-pulse">
+            <div className="text-ink-400 font-semibold animate-pulse">
               {t('ui.loading', 'Loading curriculum pathway...')}
             </div>
           </div>
         ) : filteredLessons.length === 0 ? (
           <div className="text-center py-12 duo-card">
             <span className="text-4xl mb-2 block">📚</span>
-            <p className="text-white font-black text-lg">No modules found</p>
-            <p className="text-white/60 text-xs mt-1">Try switching CEFR levels or category filters.</p>
+            <p className="text-ink-900 font-black text-lg">No modules found</p>
+            <p className="text-ink-500 text-xs mt-1">Try switching CEFR levels or category filters.</p>
           </div>
         ) : (
           <div className="relative py-8 flex flex-col items-center justify-center min-h-[480px]">
@@ -391,7 +391,7 @@ export const LessonsPage: React.FC = () => {
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="rgba(255, 255, 255, 0.2)"
+                    stroke="#cbd5e1"
                     strokeWidth="8"
                     strokeLinecap="round"
                     strokeDasharray="6 8"
@@ -421,14 +421,14 @@ export const LessonsPage: React.FC = () => {
                   {/* Section / Unit Header Banner */}
                   {showUnitHeader && item.unitGroup && (
                     <div className="w-full max-w-md my-6 z-10">
-                      <div className="p-4 rounded-2xl bg-gradient-to-r from-duo-blue/80 via-purple-600/80 to-emerald-600/80 border-2 border-white/20 shadow-xl flex items-center justify-between gap-3 text-center">
+                      <div className="p-4 rounded-2xl bg-gradient-to-r from-duo-blue via-indigo-500 to-emerald-500 border-2 border-white shadow-card-lg flex items-center justify-between gap-3 text-center">
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🏁</span>
                           <h3 className="text-white font-black text-sm md:text-base">
                             {lang === 'id' && item.unitGroup_id ? item.unitGroup_id : item.unitGroup}
                           </h3>
                         </div>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-white/20 text-white uppercase tracking-wider">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-white/25 text-white uppercase tracking-wider">
                           UNIT
                         </span>
                       </div>
@@ -448,7 +448,7 @@ export const LessonsPage: React.FC = () => {
                         initial={{ y: -10 }}
                         animate={{ y: [0, -8, 0] }}
                         transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-                        className="absolute -top-12 z-20 px-3.5 py-1.5 rounded-2xl bg-emerald-400 text-emerald-950 font-black text-xs uppercase tracking-wider shadow-glow flex items-center gap-1 border border-white/40"
+                        className="absolute -top-12 z-20 px-3.5 py-1.5 rounded-2xl bg-duo-green text-white font-black text-xs uppercase tracking-wider shadow-glow flex items-center gap-1 border-2 border-white"
                       >
                         <span>START</span>
                         <span>🚀</span>
@@ -459,15 +459,15 @@ export const LessonsPage: React.FC = () => {
                     <button
                       onClick={() => handleNodeClick(item, isUnlocked)}
                       className={`
-                        w-20 h-20 md:w-24 md:h-24 rounded-full flex flex-col items-center justify-center transition-all cursor-pointer relative shadow-2xl border-4
+                        w-20 h-20 md:w-24 md:h-24 rounded-full flex flex-col items-center justify-center transition-all cursor-pointer relative shadow-card-lg border-4
                         ${
                           isFirstIncompleteUnlocked
                             ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 border-white text-white shadow-glow scale-110 animate-pulse-glow'
                             : isCompleted
-                            ? 'bg-gradient-to-tr from-duo-blue to-purple-600 border-duo-blue-light text-white shadow-3d-blue'
+                            ? 'bg-gradient-to-tr from-duo-blue to-indigo-500 border-white text-white shadow-3d-blue'
                             : isUnlocked
-                            ? 'bg-gradient-to-tr from-sky-600 to-blue-500 border-white/40 text-white'
-                            : 'bg-surface-card border-white/10 text-white/40 opacity-70 grayscale'
+                            ? 'bg-gradient-to-tr from-sky-500 to-blue-400 border-white text-white'
+                            : 'bg-slate-100 border-slate-200 text-slate-300 opacity-80 grayscale'
                         }
                       `}
                       id={`path-node-${item.id}`}
@@ -486,7 +486,7 @@ export const LessonsPage: React.FC = () => {
                     <div className="mt-2 text-center max-w-[180px]">
                       <h4
                         className={`text-xs md:text-sm font-black leading-tight ${
-                          isUnlocked ? 'text-white' : 'text-white/40'
+                          isUnlocked ? 'text-ink-900' : 'text-ink-400'
                         }`}
                       >
                         {getTitle(item)}
@@ -506,7 +506,7 @@ export const LessonsPage: React.FC = () => {
 
         {/* Tactile Pagination Bar */}
         {totalPages > 1 && (
-          <div className="mt-8 flex flex-col items-center gap-3 p-4 rounded-3xl bg-surface-card/60 border border-surface-border">
+          <div className="mt-8 flex flex-col items-center gap-3 p-4 rounded-3xl bg-surface-panel border border-surface-border">
             <div className="flex items-center gap-2 flex-wrap justify-center">
               {/* Prev Button */}
               <Button
@@ -529,8 +529,8 @@ export const LessonsPage: React.FC = () => {
                     onClick={() => handlePageChange(p)}
                     className={`w-9 h-9 rounded-xl font-black text-xs transition-all cursor-pointer border ${
                       isActive
-                        ? 'bg-duo-blue text-white border-duo-blue-light shadow-3d-blue scale-105'
-                        : 'bg-white/10 hover:bg-white/20 text-white/70 border-white/10'
+                        ? 'bg-duo-blue text-white border-duo-blue-shadow shadow-3d-blue scale-105'
+                        : 'bg-white hover:bg-slate-50 text-ink-500 border-slate-200'
                     }`}
                     id={`page-btn-${p}`}
                   >
@@ -553,7 +553,7 @@ export const LessonsPage: React.FC = () => {
             </div>
 
             {/* Pagination Range Subtitle */}
-            <span className="text-[11px] text-white/50 font-bold">
+            <span className="text-[11px] text-ink-400 font-bold">
               {lang === 'id'
                 ? `Menampilkan ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(
                     currentPage * ITEMS_PER_PAGE,

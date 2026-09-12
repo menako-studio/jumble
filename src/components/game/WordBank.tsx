@@ -25,8 +25,8 @@ export const WordBank: React.FC<WordBankProps> = ({ items, onWordClick, disabled
         'min-h-[72px] w-full rounded-xl2 p-3 transition-all duration-200',
         'flex flex-wrap gap-2 items-center justify-center',
         isOver
-          ? 'bg-brand-900/30 ring-2 ring-brand-500/40'
-          : 'bg-surface-panel/50'
+          ? 'bg-sky-50 ring-2 ring-duo-blue/40'
+          : 'bg-surface-panel'
       )}
       id="word-bank"
     >
