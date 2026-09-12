@@ -42,9 +42,11 @@ import { AudioButton } from '../ui/AudioButton';
 import { ConceptIntroWalkthrough } from './ConceptIntroWalkthrough';
 import { GRAMMAR_MODULES } from '../../data/grammarModules';
 
+import { useAuth } from '../../context/AuthContext';
 import type { Question, CEFRLevel, HeartsState, WordItem, ConceptIntro } from '../../types';
 
 interface JumbleLevelProps {
+  lessonId?: string;
   questions: Question[];
   lessonName: string;
   cefrLevel?: CEFRLevel;
@@ -54,6 +56,7 @@ interface JumbleLevelProps {
 }
 
 export const JumbleLevel: React.FC<JumbleLevelProps> = ({
+  lessonId,
   questions: initialQuestions,
   lessonName,
   cefrLevel,
@@ -61,6 +64,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   onComplete: _onComplete,
   onExit,
 }) => {
+  const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'id';
   const { fireWin, fireCorrect } = useConfetti();
@@ -182,10 +186,11 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
     if (state.phase === 'COMPLETED') {
       const starResult = calculateStars(state.mistakesCount, state.questions.length);
       fireWin();
-      saveProgress('demo-user', currentQ?.lesson_id || 'lesson-1', starResult.stars);
-      addUserPoints('demo-user', state.score, starResult.stars);
+      const targetLessonId = lessonId || currentQ?.lesson_id || 'lesson-1';
+      saveProgress(user.id, targetLessonId, starResult.stars);
+      addUserPoints(user.id, state.score, starResult.stars);
     }
-  }, [state.phase, state.mistakesCount, state.questions.length, state.score, currentQ?.lesson_id, fireWin]);
+  }, [state.phase, state.mistakesCount, state.questions.length, state.score, currentQ?.lesson_id, lessonId, user.id, fireWin]);
 
   // Out of hearts modal triggers
   const handleStartReviewMode = () => {
@@ -253,6 +258,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
           lessonTitle={lessonName}
           cefrLevel={cefrLevel}
           onStartChallenge={() => setShowIntro(false)}
+          onClose={onExit}
           onSkip={() => setShowIntro(false)}
         />
       )}

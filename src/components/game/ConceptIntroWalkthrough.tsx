@@ -12,6 +12,7 @@ interface ConceptIntroWalkthroughProps {
   lessonTitle: string;
   cefrLevel?: string;
   onStartChallenge: () => void;
+  onClose?: () => void;
   onSkip?: () => void;
 }
 
@@ -20,6 +21,7 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
   lessonTitle,
   cefrLevel,
   onStartChallenge,
+  onClose,
   onSkip,
 }) => {
   const { t, i18n } = useTranslation();
@@ -74,9 +76,9 @@ export const ConceptIntroWalkthrough: React.FC<ConceptIntroWalkthroughProps> = (
       <header className="px-4 py-3 border-b border-white/10 flex items-center justify-between gap-4 max-w-5xl mx-auto w-full z-20">
         {/* Left: Close Button (✕) */}
         <button
-          onClick={onSkip || onStartChallenge}
+          onClick={onClose || onSkip || onStartChallenge}
           className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-all cursor-pointer text-lg"
-          title="Exit Intro"
+          title={lang === 'id' ? 'Kembali ke Lessons' : 'Exit to Lessons'}
           id="exit-intro-btn"
         >
           ✕

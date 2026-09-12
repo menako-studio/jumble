@@ -50,6 +50,7 @@ export const PlayPage: React.FC = () => {
   return (
     <JumbleLevel
       key={id}
+      lessonId={id}
       questions={questions}
       lessonName={getLessonName(lesson)}
       cefrLevel={lesson?.cefrLevel}
