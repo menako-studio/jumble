@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useLessons, useUserProgress } from '../hooks/useSupabase';
+import { useAuth } from '../context/AuthContext';
 import { StarRating } from '../components/ui/StarRating';
 import { LanguageSwitcher } from '../components/layout/LanguageSwitcher';
+import { UserProfileButton } from '../components/profile/UserProfileButton';
+import { HorizontalScroller } from '../components/ui/HorizontalScroller';
+import { Button } from '../components/ui/Button';
 import { getHeartsState, MAX_HEARTS } from '../lib/heartsManager';
 import { GRAMMAR_CATEGORIES_METADATA } from '../data/grammarModules';
 import type { CEFRLevel, GrammarCategory, GrammarSubCategory, GrammarModule } from '../types';
@@ -20,12 +24,14 @@ const CEFR_TABS: { id: CEFRLevel | 'ALL'; label: string; sub: string }[] = [
 
 // Offset patterns for the serpentine pathway curve (in percentage or px shift)
 const NODE_OFFSETS = [0, -60, -90, -60, 0, 60, 90, 60];
+const ITEMS_PER_PAGE = 8;
 
 export const LessonsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { lessons, loading } = useLessons();
-  const { progress } = useUserProgress('demo-user');
+  const { progress } = useUserProgress(user.id);
   const lang = (i18n.language as 'en' | 'id') || 'en';
 
   const [selectedCefr, setSelectedCefr] = useState<CEFRLevel | 'ALL'>('ALL');
@@ -33,10 +39,16 @@ export const LessonsPage: React.FC = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState<GrammarSubCategory | 'ALL'>('ALL');
   const [heartsState, setHeartsState] = useState(getHeartsState());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     setHeartsState(getHeartsState());
   }, []);
+
+  // Reset pagination when filter criteria change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCefr, selectedCategory, selectedSubCategory]);
 
   // Calculate stars per lesson from user progress
   const starsMap = React.useMemo(() => {
@@ -66,7 +78,7 @@ export const LessonsPage: React.FC = () => {
     return list.sort((a, b) => (a.sequenceOrder || 99) - (b.sequenceOrder || 99));
   }, [lessons, selectedCefr, selectedCategory, selectedSubCategory]);
 
-  // Determine unlock state for each lesson sequentially
+  // Determine unlock state for each lesson sequentially across full filtered set
   const unlockedMap = React.useMemo(() => {
     const map: Record<string, boolean> = {};
     let canUnlockNext = true;
@@ -90,6 +102,24 @@ export const LessonsPage: React.FC = () => {
   // Calculate overall completion statistics
   const totalCompleted = filteredLessons.filter((l) => (starsMap[l.id] || 0) > 0).length;
   const totalStars = Object.values(starsMap).reduce((sum, s) => sum + s, 0);
+
+  // Pagination calculations
+  const totalPages = Math.max(1, Math.ceil(filteredLessons.length / ITEMS_PER_PAGE));
+  const paginatedLessons = React.useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredLessons.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredLessons, currentPage]);
+
+  // Determine which page contains the active current incomplete unlocked lesson
+  const activeLessonIndex = filteredLessons.findIndex((l) => unlockedMap[l.id] && !(starsMap[l.id] > 0));
+  const activeLessonPage = activeLessonIndex >= 0 ? Math.floor(activeLessonIndex / ITEMS_PER_PAGE) + 1 : 1;
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 180, behavior: 'smooth' });
+    }
+  };
 
   const handleNodeClick = (item: GrammarModule, isUnlocked: boolean) => {
     if (isUnlocked) {
@@ -132,6 +162,7 @@ export const LessonsPage: React.FC = () => {
               onClick={() => navigate('/')}
               className="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-all cursor-pointer border border-white/10"
               id="back-home-btn"
+              title="Back to Landing Page"
             >
               ←
             </button>
@@ -146,6 +177,9 @@ export const LessonsPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* User Profile & Auto-Save Sync Widget */}
+            <UserProfileButton totalStars={totalStars} completedLessonsCount={totalCompleted} />
+
             {/* Hearts Counter */}
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-surface-panel border border-surface-border shadow-sm">
               <span className="text-lg">{heartsState.isProUser ? '♾️' : '❤️'}</span>
@@ -153,33 +187,36 @@ export const LessonsPage: React.FC = () => {
                 {heartsState.isProUser ? 'PRO' : `${heartsState.heartsCount}/${MAX_HEARTS}`}
               </span>
             </div>
+
             <LanguageSwitcher />
           </div>
         </div>
 
-        {/* CEFR Level Tabs */}
-        <div className="max-w-7xl mx-auto px-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
-          {CEFR_TABS.map((tab) => {
-            const isActive = selectedCefr === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setSelectedCefr(tab.id)}
-                className={`
-                  px-4 py-1.5 rounded-2xl font-black text-xs shrink-0 transition-all flex flex-col items-center cursor-pointer border-2
-                  ${
-                    isActive
-                      ? 'bg-duo-blue text-white border-duo-blue-light shadow-3d-blue scale-105'
-                      : 'bg-white/5 text-white/70 hover:bg-white/10 border-transparent'
-                  }
-                `}
-                id={`cefr-tab-${tab.id}`}
-              >
-                <span>{tab.label}</span>
-                <span className="text-[9px] opacity-75 font-semibold">{tab.sub}</span>
-              </button>
-            );
-          })}
+        {/* CEFR Level Tabs with Horizontal Scroller */}
+        <div className="max-w-7xl mx-auto px-4 pb-3">
+          <HorizontalScroller>
+            {CEFR_TABS.map((tab) => {
+              const isActive = selectedCefr === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedCefr(tab.id)}
+                  className={`
+                    px-4 py-1.5 rounded-2xl font-black text-xs shrink-0 transition-all flex flex-col items-center cursor-pointer border-2
+                    ${
+                      isActive
+                        ? 'bg-duo-blue text-white border-duo-blue-light shadow-3d-blue scale-105'
+                        : 'bg-white/5 text-white/70 hover:bg-white/10 border-transparent'
+                    }
+                  `}
+                  id={`cefr-tab-${tab.id}`}
+                >
+                  <span>{tab.label}</span>
+                  <span className="text-[9px] opacity-75 font-semibold">{tab.sub}</span>
+                </button>
+              );
+            })}
+          </HorizontalScroller>
         </div>
       </header>
 
@@ -211,42 +248,51 @@ export const LessonsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-          <button
-            onClick={() => {
-              setSelectedCategory('ALL');
-              setSelectedSubCategory('ALL');
-            }}
-            className={`px-4 py-2 rounded-2xl text-xs font-black shrink-0 transition-all cursor-pointer border-2 ${
-              selectedCategory === 'ALL'
-                ? 'bg-duo-yellow text-amber-950 border-duo-yellow-light shadow-3d-yellow font-black'
-                : 'bg-white/5 text-white/80 hover:bg-white/10 border-white/10'
-            }`}
-          >
-            🌟 All Categories
-          </button>
-          {GRAMMAR_CATEGORIES_METADATA.map((catObj) => {
-            const isActive = selectedCategory === catObj.key;
-            const labelName = lang === 'id' ? catObj.name.id : catObj.name.en;
-            return (
-              <button
-                key={catObj.key}
-                onClick={() => {
-                  setSelectedCategory(catObj.key);
-                  setSelectedSubCategory('ALL');
-                }}
-                className={`px-4 py-2 rounded-2xl text-xs font-black shrink-0 transition-all flex items-center gap-2 cursor-pointer border-2 ${
-                  isActive
-                    ? 'bg-duo-yellow text-amber-950 border-duo-yellow-light shadow-3d-yellow font-black'
-                    : 'bg-white/5 text-white/80 hover:bg-white/10 border-white/10'
-                }`}
-              >
-                <span>{catObj.icon}</span>
-                <span>{labelName}</span>
-              </button>
-            );
-          })}
+        {/* Main Category Pills with Enhanced Horizontal Scroller */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between text-xs text-white/60 font-bold px-1">
+            <span>{lang === 'id' ? 'Kategori Tata Bahasa' : 'Grammar Categories'}</span>
+            <span className="text-[11px] text-white/40 hidden sm:inline">
+              {lang === 'id' ? 'Geser atau klik tombol panah ‹ ›' : 'Scroll or use arrows ‹ ›'}
+            </span>
+          </div>
+
+          <HorizontalScroller>
+            <button
+              onClick={() => {
+                setSelectedCategory('ALL');
+                setSelectedSubCategory('ALL');
+              }}
+              className={`px-4 py-2 rounded-2xl text-xs font-black shrink-0 transition-all cursor-pointer border-2 ${
+                selectedCategory === 'ALL'
+                  ? 'bg-duo-yellow text-amber-950 border-duo-yellow-light shadow-3d-yellow font-black'
+                  : 'bg-white/5 text-white/80 hover:bg-white/10 border-white/10'
+              }`}
+            >
+              🌟 All Categories
+            </button>
+            {GRAMMAR_CATEGORIES_METADATA.map((catObj) => {
+              const isActive = selectedCategory === catObj.key;
+              const labelName = lang === 'id' ? catObj.name.id : catObj.name.en;
+              return (
+                <button
+                  key={catObj.key}
+                  onClick={() => {
+                    setSelectedCategory(catObj.key);
+                    setSelectedSubCategory('ALL');
+                  }}
+                  className={`px-4 py-2 rounded-2xl text-xs font-black shrink-0 transition-all flex items-center gap-2 cursor-pointer border-2 ${
+                    isActive
+                      ? 'bg-duo-yellow text-amber-950 border-duo-yellow-light shadow-3d-yellow font-black'
+                      : 'bg-white/5 text-white/80 hover:bg-white/10 border-white/10'
+                  }`}
+                >
+                  <span>{catObj.icon}</span>
+                  <span>{labelName}</span>
+                </button>
+              );
+            })}
+          </HorizontalScroller>
         </div>
 
         {/* Connected Sub-Category Pills */}
@@ -255,10 +301,10 @@ export const LessonsPage: React.FC = () => {
             <span className="text-xs text-white/50 font-black uppercase tracking-wider">
               {lang === 'id' ? 'Sub-Kategori Terkoneksi' : 'Connected Sub-Categories'}:
             </span>
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <HorizontalScroller>
               <button
                 onClick={() => setSelectedSubCategory('ALL')}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
                   selectedSubCategory === 'ALL'
                     ? 'bg-duo-blue text-white font-black'
                     : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -273,7 +319,7 @@ export const LessonsPage: React.FC = () => {
                   <button
                     key={sub.key}
                     onClick={() => setSelectedSubCategory(sub.key)}
-                    className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
                       isSubActive
                         ? 'bg-duo-blue text-white font-black shadow-sm'
                         : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -283,7 +329,27 @@ export const LessonsPage: React.FC = () => {
                   </button>
                 );
               })}
+            </HorizontalScroller>
+          </div>
+        )}
+
+        {/* Jump to Active Challenge Banner when on another page */}
+        {totalPages > 1 && currentPage !== activeLessonPage && (
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30">
+            <div className="flex items-center gap-2 text-xs text-emerald-300 font-bold">
+              <span>🚀</span>
+              <span>
+                {lang === 'id'
+                  ? `Lesson aktif kamu ada di Halaman ${activeLessonPage}`
+                  : `Your current unlocked challenge is on Page ${activeLessonPage}`}
+              </span>
             </div>
+            <button
+              onClick={() => handlePageChange(activeLessonPage)}
+              className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black text-xs transition-all cursor-pointer shadow-md"
+            >
+              {lang === 'id' ? 'Lompat ke Sana →' : 'Jump There →'}
+            </button>
           </div>
         )}
 
@@ -301,14 +367,14 @@ export const LessonsPage: React.FC = () => {
             <p className="text-white/60 text-xs mt-1">Try switching CEFR levels or category filters.</p>
           </div>
         ) : (
-          <div className="relative py-8 flex flex-col items-center justify-center">
+          <div className="relative py-8 flex flex-col items-center justify-center min-h-[480px]">
             {/* SVG Connecting Curved Path Line behind nodes */}
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {filteredLessons.map((_, idx) => {
-                if (idx === filteredLessons.length - 1) return null;
+              {paginatedLessons.map((_, idx) => {
+                if (idx === paginatedLessons.length - 1) return null;
                 const offsetCurrent = NODE_OFFSETS[idx % NODE_OFFSETS.length];
                 const offsetNext = NODE_OFFSETS[(idx + 1) % NODE_OFFSETS.length];
 
@@ -334,8 +400,8 @@ export const LessonsPage: React.FC = () => {
               })}
             </svg>
 
-            {/* Render Nodes along the Pathway */}
-            {filteredLessons.map((item, idx) => {
+            {/* Render Nodes along the Pathway for current page */}
+            {paginatedLessons.map((item, idx) => {
               const stars = starsMap[item.id] ?? 0;
               const isUnlocked = unlockedMap[item.id] ?? false;
               const isCompleted = stars > 0;
@@ -344,7 +410,7 @@ export const LessonsPage: React.FC = () => {
 
               // Check if Unit Group Header should render
               const showUnitHeader =
-                idx === 0 || item.unitGroup !== filteredLessons[idx - 1]?.unitGroup;
+                idx === 0 || item.unitGroup !== paginatedLessons[idx - 1]?.unitGroup;
 
               const catMeta = GRAMMAR_CATEGORIES_METADATA.find((c) => c.key === item.category) || {
                 icon: '📘',
@@ -435,6 +501,69 @@ export const LessonsPage: React.FC = () => {
                 </React.Fragment>
               );
             })}
+          </div>
+        )}
+
+        {/* Tactile Pagination Bar */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex flex-col items-center gap-3 p-4 rounded-3xl bg-surface-card/60 border border-surface-border">
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              {/* Prev Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`text-xs ${currentPage === 1 ? 'opacity-40 pointer-events-none' : ''}`}
+                id="pagination-prev-btn"
+              >
+                ← {lang === 'id' ? 'Sebelumnya' : 'Prev'}
+              </Button>
+
+              {/* Page Number Pills */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
+                const isActive = p === currentPage;
+                return (
+                  <button
+                    key={p}
+                    onClick={() => handlePageChange(p)}
+                    className={`w-9 h-9 rounded-xl font-black text-xs transition-all cursor-pointer border ${
+                      isActive
+                        ? 'bg-duo-blue text-white border-duo-blue-light shadow-3d-blue scale-105'
+                        : 'bg-white/10 hover:bg-white/20 text-white/70 border-white/10'
+                    }`}
+                    id={`page-btn-${p}`}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+
+              {/* Next Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`text-xs ${currentPage === totalPages ? 'opacity-40 pointer-events-none' : ''}`}
+                id="pagination-next-btn"
+              >
+                {lang === 'id' ? 'Berikutnya' : 'Next'} →
+              </Button>
+            </div>
+
+            {/* Pagination Range Subtitle */}
+            <span className="text-[11px] text-white/50 font-bold">
+              {lang === 'id'
+                ? `Menampilkan ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(
+                    currentPage * ITEMS_PER_PAGE,
+                    filteredLessons.length
+                  )} dari ${filteredLessons.length} lessons (Halaman ${currentPage} dari ${totalPages})`
+                : `Showing ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(
+                    currentPage * ITEMS_PER_PAGE,
+                    filteredLessons.length
+                  )} of ${filteredLessons.length} lessons (Page ${currentPage} of ${totalPages})`}
+            </span>
           </div>
         )}
       </main>
