@@ -112,37 +112,40 @@ jumble/
 ## 3. CURRENT IMPLEMENTATION STATE & DATA FLOW
 ### Active Modules & Core Features
 1. **Dedicated Landing Page (`HomePage.tsx`)**:
-   - Distinct from the learning dashboard, featuring an engaging hero, animated mascot, curriculum preview, feature pillars, and profile sync widget.
-2. **Serpentine Pathway Map & Pagination (`LessonsPage.tsx`)**:
-   - Replaces traditional grid cards with a serpentine zigzag pathway map (`brilliant.png` & Duolingo layout).
-   - Alternating offset milestone nodes connected by dashed SVG path lines.
-   - Built-in pagination (`ITEMS_PER_PAGE = 8`) to eliminate infinite scrolling fatigue.
-   - Interactive jump-to-challenge banner directing learners to their active level page.
-3. **Horizontal Category Carousel (`HorizontalScroller.tsx`)**:
-   - Tactile left/right navigation arrow buttons (`‹` and `›`), mouse wheel horizontal translation, grab-and-drag desktop support, and gradient edge masks.
-4. **Auto-Save & Google Authentication (`AuthContext.tsx`, `ProfileModal.tsx`)**:
+   - Distinct from the learning dashboard, featuring an engaging hero, animated mascot, curriculum syllabus preview, feature pillars, and profile sync widget.
+   - Refined copywriting: removed accredited CERF/CEFR certification claims to prevent miscommunication, framing progression as structured skill stages (Beginner to Advanced & Exam Prep).
+2. **Structured Curriculum Units & Topic Syllabus Cards (`LessonsPage.tsx`)**:
+   - Replaced serpentine Duolingo-style winding snake map with clean, structured Unit/Theme sections and syllabus cards.
+   - Each topic clearly communicates its pedagogical flow: `💡 Concept & Rules ➔ 🎯 Practice & Quiz`.
+   - Distinct class/theme breakdown with unit completion meters, progress tracking, and pagination.
+3. **Word Scramble with Distractor Support & Flexible Submissions (`JumbleLevel.tsx`, `useGameState.ts`)**:
+   - Added distractor word tiles to the word bank pool so questions cannot be solved by trivial process of elimination.
+   - Removed the rigid constraint requiring all bank tiles to be placed; users can submit their answer once formed.
+   - Beginner modules curated with accessible, foundational vocabulary.
+4. **Spot-the-Mistake Error Identification Activity (`SpotTheMistakeQuestion.tsx`)**:
+   - New interactive question format where learners identify and tap grammatical errors within sentences.
+5. **Accurate Star Rating & 0-Star Failure State (`starCalculator.ts`, `WinModal.tsx`)**:
+   - Fixed star formula to scale accurately with total questions.
+   - Completely failed sessions (salah total / error rate >= 75%) correctly award 0 stars with encouraging retry feedback.
+6. **Auto-Save & Google Authentication (`AuthContext.tsx`, `ProfileModal.tsx`)**:
    - Supabase Google OAuth integration with persistent local guest fallback.
-   - Automatic background migration of guest progress to Supabase `user_progress` and `users` tables upon sign in.
-   - Real-time auto-save indicator (☁️) ensuring learning progress is never lost on refresh or deployment restarts.
-5. **Gamified Concept Intro (`ConceptIntroWalkthrough.tsx`)**:
+   - Real-time auto-save indicator (☁️) ensuring learning progress is never lost.
+7. **Gamified Concept Intro (`ConceptIntroWalkthrough.tsx`)**:
    - Segmented top progress bar, interactive formula cards, TTS audio examples, and warm-up questions.
-   - Fixed exit `✕` button to return to `/lessons` map cleanly rather than unintentionally launching gameplay questions.
-6. **Groq AI Grammar LLM Assistant (`AITutorModal.tsx` & `groqClient.ts`)**:
+8. **Groq AI Grammar LLM Assistant (`AITutorModal.tsx` & `groqClient.ts`)**:
    - Powered by Groq API (`llama-3.3-70b-versatile`) with context-aware Indonesian/English prompts.
-7. **Production SPA Routing (`vercel.json`)**:
-   - Clean Vercel rewrite configuration eliminating 404 errors on direct navigation or page refresh for `/lessons` and `/play/:id`.
-8. **Light Design System Overhaul (Sana Labs × Duolingo)**:
-   - Full conversion from the legacy dark navy theme to a crisp light theme across all 24 component/page files — white/porcelain surfaces, high-contrast slate typography, tactile `border-b-4` 3D elevation on buttons and word tiles, pastel mint/coral feedback drawers matching the spec exactly.
-   - New `exam` (indigo/violet) accent token for Exam Prep tags, `feedback.*` pastel tokens, progress-bar shimmer sweep animation.
 9. **Synthesized Sound Engine**:
-   - Zero-asset Web Audio cues (ascending chime on correct, soft thud on mistake, tile pop/remove clicks, win flourish) wired into `JumbleLevel`, with a persisted mute toggle in `CardHeader` (lucide `Volume2`/`VolumeX`).
+   - Zero-asset Web Audio cues (ascending chime on correct, soft thud on mistake, tile pop/remove clicks, win flourish).
 
 ---
 
 ## 4. VERIFICATION & BUILD CHECKS
-- Security Audit (`npm audit`): Clean with `found 0 vulnerabilities` (React Router DOM ^7.18.3, PostCSS ^8.5.28).
 - TypeScript compiler checks (`tsc -b`): Clean compilation without errors or warnings.
-- Vite Production Build (`npm run build`): Successfully outputs minified client bundle.
+- Vite Production Build (`npm run build`): Successfully outputs minified client bundle with 0 errors.
+- Unit & Logic Automated Verification (`npx tsx`):
+  - Verified 0 mistakes returns 3 stars (`perfect`).
+  - Verified 1 mistake on short session returns 1 star (`good`).
+  - Verified total mistakes (salah total) strictly returns 0 stars (`gameover`).
+  - Verified Jumble submission with distractor left behind evaluates correctly.
+  - Verified Spot-the-Mistake error selection and correction logic.
 - Local Dev Server: Responds with `HTTP/1.1 200 OK` on `/` and `/lessons`.
-- ESLint (`npm run lint`): 13 pre-existing errors (React `set-state-in-effect` patterns, a couple of unused-arg/`any` lints) — unchanged before/after the light-theme + audio overhaul; none introduced by it.
-- Manual visual QA (2026-09-12): Full user journey walked end-to-end in-browser after the light-theme overhaul — Home → Lessons pathway map → Concept Intro walkthrough → Jumble word-tile question → Multiple Choice question → correct-answer feedback drawer → Level Complete modal. All screens render on the new light Sana Labs × Duolingo palette with no dark-theme remnants.
