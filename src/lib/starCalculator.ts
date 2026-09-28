@@ -30,8 +30,8 @@ export function calculateStars(
   // Error rate calculation
   const errorRate = mistakesMade / totalQuestions;
 
-  // Great performance: at most 1 mistake on short lessons, or <= 35% error rate on longer lessons
-  if ((mistakesMade === 1 && totalQuestions >= 2) || (errorRate <= 0.35 && mistakesMade < totalQuestions)) {
+  // Great performance: at most 1 mistake on lessons with 3+ questions, or <= 35% error rate
+  if ((mistakesMade === 1 && totalQuestions >= 3) || (errorRate <= 0.35 && mistakesMade < totalQuestions)) {
     return { stars: 2, isPerfect: false, message: 'great' };
   }
 
