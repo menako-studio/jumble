@@ -141,8 +141,8 @@ export const HomePage: React.FC = () => {
           className="text-ink-500 text-base sm:text-lg md:text-xl font-semibold mb-8 leading-relaxed max-w-2xl"
         >
           {lang === 'id'
-            ? 'Belajar tata bahasa Inggris interaktif dengan panduan konsep ala Brilliant, tantangan kartu gamifikasi ala Duolingo, dan AI Grammar Tutor cerdas (Groq Llama 3.3). CEFR A1–B2 & Persiapan IELTS/TOEFL.'
-            : 'Interactive step-by-step concept intros, playful card challenges, and an on-demand AI Grammar Tutor powered by Groq Llama 3.3. Tailored for CEFR A1–B2 and Exam Prep.'}
+            ? 'Belajar tata bahasa Inggris interaktif dengan panduan konsep terstruktur, tantangan latihan variatif, dan AI Grammar Tutor cerdas (Groq Llama 3.3). Dari tingkat Dasar hingga Mahir & Persiapan Ujian.'
+            : 'Interactive step-by-step concept intros, adaptive practice challenges, and an on-demand AI Grammar Tutor powered by Groq Llama 3.3. From Beginner to Advanced & Exam Prep.'}
         </motion.p>
 
         {/* Action Buttons */}
@@ -188,7 +188,7 @@ export const HomePage: React.FC = () => {
           <p className="text-ink-500 font-semibold text-sm max-w-lg mx-auto">
             {lang === 'id'
               ? 'Kombinasi metode visual, penjelasan interaktif, dan tutor AI cerdas.'
-              : 'Combining visual concept intros, serpentine milestone unlocks, and instant AI tutor assistance.'}
+              : 'Combining visual concept intros, structured syllabus topics, and instant AI tutor assistance.'}
           </p>
         </div>
 
@@ -199,12 +199,12 @@ export const HomePage: React.FC = () => {
               🏁
             </div>
             <h3 className="text-xl font-black text-ink-900">
-              {lang === 'id' ? 'Peta Belajar Serpentine' : 'Serpentine Pathway Map'}
+              {lang === 'id' ? 'Kurikulum Topik Terstruktur' : 'Structured Topic Units'}
             </h3>
             <p className="text-sm text-ink-500 font-semibold leading-relaxed">
               {lang === 'id'
-                ? 'Peta berliku dengan milestone berurutan. Setiap lesson baru terbuka saat kamu berhasil mengumpulkan bintang di tantangan sebelumnya.'
-                : 'Zigzagging pathway with progressive milestone unlocking and star ratings, keeping you focused without overwhelming choices.'}
+                ? 'Pembagian materi per tema dan unit yang jelas. Setiap topik memandu kamu dari teori konsep hingga latihan soal interaktif.'
+                : 'Clear units organized by theme with step-by-step progression from concept breakdown to interactive challenges.'}
             </p>
           </div>
 
@@ -214,12 +214,12 @@ export const HomePage: React.FC = () => {
               💡
             </div>
             <h3 className="text-xl font-black text-ink-900">
-              {lang === 'id' ? 'Intro Konsep Interaktif' : 'Brilliant-Style Intros'}
+              {lang === 'id' ? 'Intro Konsep Interaktif' : 'Concept Rule Breakdowns'}
             </h3>
             <p className="text-sm text-ink-500 font-semibold leading-relaxed">
               {lang === 'id'
                 ? 'Pelajari rumus, pola aturan, dan contoh suara sebelum memulai kuis. Tidak perlu menghafal rumus abstrak tanpa konteks.'
-                : 'Step-by-step formula breakdowns, native TTS audio examples, and warm-up checks before jumping into the word tiles.'}
+                : 'Step-by-step formula breakdowns, native TTS audio examples, and warm-up checks before jumping into the exercises.'}
             </p>
           </div>
 
@@ -244,23 +244,25 @@ export const HomePage: React.FC = () => {
       <section id="curriculum" className="relative z-10 max-w-6xl mx-auto px-4 py-16 w-full border-t border-surface-border">
         <div className="text-center mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-duo-blue-dark px-3 py-1 rounded-full bg-sky-50 border border-sky-200">
-            Curriculum Standard
+            {lang === 'id' ? 'Tingkat Kemampuan' : 'Learning Levels'}
           </span>
           <h2 className="text-3xl sm:text-4xl font-black text-ink-900 mt-3 mb-2">
-            CEFR Levels & Exam Modules
+            {lang === 'id' ? 'Tingkat Kemampuan & Topik Grammar' : 'Skill Levels & Grammar Topics'}
           </h2>
           <p className="text-ink-500 font-semibold text-sm max-w-md mx-auto">
-            From A1 Elementary fundamentals to Advanced B2 nuance and official exam preparation.
+            {lang === 'id'
+              ? 'Dari dasar pemula hingga tingkat mahir dan latihan soal ujian.'
+              : 'From beginner fundamentals to advanced nuance and exam preparation.'}
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
           {[
-            { level: 'A1', label: 'Elementary', color: 'from-emerald-500 to-teal-500' },
-            { level: 'A2', label: 'Pre-Intermediate', color: 'from-teal-500 to-sky-500' },
-            { level: 'B1', label: 'Intermediate', color: 'from-sky-500 to-blue-500' },
-            { level: 'B1+', label: 'Upper-Intermediate', color: 'from-blue-500 to-indigo-500' },
-            { level: 'B2', label: 'Advanced', color: 'from-indigo-500 to-purple-500' },
+            { level: 'A1', label: lang === 'id' ? 'Pemula' : 'Beginner', color: 'from-emerald-500 to-teal-500' },
+            { level: 'A2', label: lang === 'id' ? 'Pra-Menengah' : 'Pre-Intermediate', color: 'from-teal-500 to-sky-500' },
+            { level: 'B1', label: lang === 'id' ? 'Menengah' : 'Intermediate', color: 'from-sky-500 to-blue-500' },
+            { level: 'B1+', label: lang === 'id' ? 'Menengah Atas' : 'Upper-Intermediate', color: 'from-blue-500 to-indigo-500' },
+            { level: 'B2', label: lang === 'id' ? 'Mahir' : 'Advanced', color: 'from-indigo-500 to-purple-500' },
             { level: 'EXAM', label: 'IELTS • TOEFL • TOEIC', color: 'from-amber-500 to-orange-500', isExam: true },
           ].map((c) => (
             <Link
@@ -285,7 +287,7 @@ export const HomePage: React.FC = () => {
             to="/lessons"
             className="btn-primary btn text-base px-8 py-3 rounded-2xl inline-flex items-center gap-2"
           >
-            <span>{lang === 'id' ? 'Lihat Peta Belajar Lengkap' : 'Explore Full Learning Map'}</span>
+            <span>{lang === 'id' ? 'Buka Silabus Belajar Lengkap' : 'Explore Full Syllabus'}</span>
             <span>→</span>
           </Link>
         </div>
