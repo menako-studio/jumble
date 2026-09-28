@@ -22,8 +22,6 @@ const CEFR_TABS: { id: CEFRLevel | 'ALL'; label: string; sub: string }[] = [
   { id: 'B2', label: 'B2', sub: 'Advanced' },
 ];
 
-// Offset patterns for the serpentine pathway curve (in percentage or px shift)
-const NODE_OFFSETS = [0, -60, -90, -60, 0, 60, 90, 60];
 const ITEMS_PER_PAGE = 8;
 
 export const LessonsPage: React.FC = () => {
@@ -110,6 +108,25 @@ export const LessonsPage: React.FC = () => {
     return filteredLessons.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredLessons, currentPage]);
 
+  // Group paginated lessons by unit/theme for clean structured syllabus display
+  const groupedUnits = React.useMemo(() => {
+    const map = new Map<string, { unitTitle: string; unitTitleId?: string; items: GrammarModule[] }>();
+
+    paginatedLessons.forEach((item) => {
+      const key = item.unitGroup || 'General Grammar Topics';
+      if (!map.has(key)) {
+        map.set(key, {
+          unitTitle: item.unitGroup || 'General Grammar Topics',
+          unitTitleId: item.unitGroup_id,
+          items: [],
+        });
+      }
+      map.get(key)!.items.push(item);
+    });
+
+    return Array.from(map.values());
+  }, [paginatedLessons]);
+
   // Determine which page contains the active current incomplete unlocked lesson
   const activeLessonIndex = filteredLessons.findIndex((l) => unlockedMap[l.id] && !(starsMap[l.id] > 0));
   const activeLessonPage = activeLessonIndex >= 0 ? Math.floor(activeLessonIndex / ITEMS_PER_PAGE) + 1 : 1;
@@ -171,7 +188,7 @@ export const LessonsPage: React.FC = () => {
                 {t('ui.lessonSelect', 'Grammar Pathway')}
               </h1>
               <p className="text-ink-500 text-xs font-semibold hidden sm:block">
-                Brilliant & Duolingo Style Unlocking Map
+                Structured Units & Interactive Practice
               </p>
             </div>
           </div>
@@ -353,7 +370,7 @@ export const LessonsPage: React.FC = () => {
           </div>
         )}
 
-        {/* SERPENTINE PATHWAY MAP (Matching brilliant.png & Duolingo) */}
+        {/* STRUCTURED TOPIC UNITS & SYLLABUS CARDS */}
         {loading ? (
           <div className="flex items-center justify-center h-40">
             <div className="text-ink-400 font-semibold animate-pulse">
@@ -364,141 +381,164 @@ export const LessonsPage: React.FC = () => {
           <div className="text-center py-12 duo-card">
             <span className="text-4xl mb-2 block">📚</span>
             <p className="text-ink-900 font-black text-lg">No modules found</p>
-            <p className="text-ink-500 text-xs mt-1">Try switching CEFR levels or category filters.</p>
+            <p className="text-ink-500 text-xs mt-1">Try switching level or category filters.</p>
           </div>
         ) : (
-          <div className="relative py-8 flex flex-col items-center justify-center min-h-[480px]">
-            {/* SVG Connecting Curved Path Line behind nodes */}
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {paginatedLessons.map((_, idx) => {
-                if (idx === paginatedLessons.length - 1) return null;
-                const offsetCurrent = NODE_OFFSETS[idx % NODE_OFFSETS.length];
-                const offsetNext = NODE_OFFSETS[(idx + 1) % NODE_OFFSETS.length];
-
-                // Approximate center positions relative to container
-                const y1 = idx * 160 + 50;
-                const y2 = (idx + 1) * 160 + 50;
-                const x1 = `calc(50% + ${offsetCurrent}px)`;
-                const x2 = `calc(50% + ${offsetNext}px)`;
-
-                return (
-                  <line
-                    key={idx}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke="#cbd5e1"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    strokeDasharray="6 8"
-                  />
-                );
-              })}
-            </svg>
-
-            {/* Render Nodes along the Pathway for current page */}
-            {paginatedLessons.map((item, idx) => {
-              const stars = starsMap[item.id] ?? 0;
-              const isUnlocked = unlockedMap[item.id] ?? false;
-              const isCompleted = stars > 0;
-              const offsetPx = NODE_OFFSETS[idx % NODE_OFFSETS.length];
-              const isFirstIncompleteUnlocked = isUnlocked && !isCompleted;
-
-              // Check if Unit Group Header should render
-              const showUnitHeader =
-                idx === 0 || item.unitGroup !== paginatedLessons[idx - 1]?.unitGroup;
-
-              const catMeta = GRAMMAR_CATEGORIES_METADATA.find((c) => c.key === item.category) || {
-                icon: '📘',
-              };
+          <div className="flex flex-col gap-8 w-full py-4">
+            {groupedUnits.map((group) => {
+              const unitTotal = group.items.length;
+              const unitDone = group.items.filter((i) => (starsMap[i.id] || 0) > 0).length;
+              const unitPct = Math.round((unitDone / unitTotal) * 100);
 
               return (
-                <React.Fragment key={item.id}>
-                  {/* Section / Unit Header Banner */}
-                  {showUnitHeader && item.unitGroup && (
-                    <div className="w-full max-w-md my-6 z-10">
-                      <div className="p-4 rounded-2xl bg-gradient-to-r from-duo-blue via-indigo-500 to-emerald-500 border-2 border-white shadow-card-lg flex items-center justify-between gap-3 text-center">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl">🏁</span>
-                          <h3 className="text-white font-black text-sm md:text-base">
-                            {lang === 'id' && item.unitGroup_id ? item.unitGroup_id : item.unitGroup}
-                          </h3>
-                        </div>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-white/25 text-white uppercase tracking-wider">
-                          UNIT
+                <section key={group.unitTitle} className="flex flex-col gap-4">
+                  {/* Theme / Unit Header */}
+                  <div className="p-5 rounded-3xl bg-white border-2 border-surface-border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 text-duo-blue-dark flex items-center justify-center text-2xl font-black shrink-0 shadow-sm">
+                        📘
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-duo-blue-dark bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full">
+                          {lang === 'id' ? 'TEMA & KELAS' : 'CURRICULUM THEME'}
                         </span>
+                        <h3 className="text-lg font-black text-ink-900 mt-1">
+                          {lang === 'id' && group.unitTitleId ? group.unitTitleId : group.unitTitle}
+                        </h3>
                       </div>
                     </div>
-                  )}
 
-                  {/* Individual Node Container */}
-                  <div
-                    className="relative my-6 z-10 flex flex-col items-center"
-                    style={{
-                      transform: `translateX(${offsetPx}px)`,
-                    }}
-                  >
-                    {/* Active Mascot Floating Badge */}
-                    {isFirstIncompleteUnlocked && (
-                      <motion.div
-                        initial={{ y: -10 }}
-                        animate={{ y: [0, -8, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-                        className="absolute -top-12 z-20 px-3.5 py-1.5 rounded-2xl bg-duo-green text-white font-black text-xs uppercase tracking-wider shadow-glow flex items-center gap-1 border-2 border-white"
-                      >
-                        <span>START</span>
-                        <span>🚀</span>
-                      </motion.div>
-                    )}
-
-                    {/* Milestone Circle Button */}
-                    <button
-                      onClick={() => handleNodeClick(item, isUnlocked)}
-                      className={`
-                        w-20 h-20 md:w-24 md:h-24 rounded-full flex flex-col items-center justify-center transition-all cursor-pointer relative shadow-card-lg border-4
-                        ${
-                          isFirstIncompleteUnlocked
-                            ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 border-white text-white shadow-glow scale-110 animate-pulse-glow'
-                            : isCompleted
-                            ? 'bg-gradient-to-tr from-duo-blue to-indigo-500 border-white text-white shadow-3d-blue'
-                            : isUnlocked
-                            ? 'bg-gradient-to-tr from-sky-500 to-blue-400 border-white text-white'
-                            : 'bg-slate-100 border-slate-200 text-slate-300 opacity-80 grayscale'
-                        }
-                      `}
-                      id={`path-node-${item.id}`}
-                    >
-                      <span className="text-2xl md:text-3xl leading-none">
-                        {!isUnlocked ? '🔒' : isCompleted ? '✨' : catMeta.icon}
+                    <div className="flex items-center gap-3 self-end sm:self-auto">
+                      <span className="text-xs font-black text-ink-500">
+                        {unitDone}/{unitTotal} {lang === 'id' ? 'Selesai' : 'Completed'} ({unitPct}%)
                       </span>
-                      {item.isProOnly && (
-                        <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-400 text-amber-950 text-xs font-black flex items-center justify-center shadow-md">
-                          👑
-                        </span>
-                      )}
-                    </button>
-
-                    {/* Node Title & Star Rating Label */}
-                    <div className="mt-2 text-center max-w-[180px]">
-                      <h4
-                        className={`text-xs md:text-sm font-black leading-tight ${
-                          isUnlocked ? 'text-ink-900' : 'text-ink-400'
-                        }`}
-                      >
-                        {getTitle(item)}
-                      </h4>
-
-                      {/* Stars Earned */}
-                      <div className="mt-1 flex justify-center">
-                        <StarRating stars={stars} size="sm" animate={false} />
+                      <div className="w-24 h-2.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                        <div
+                          className="h-full bg-duo-green rounded-full transition-all duration-300"
+                          style={{ width: `${unitPct}%` }}
+                        />
                       </div>
                     </div>
                   </div>
-                </React.Fragment>
+
+                  {/* Structured Topic Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {group.items.map((item) => {
+                      const stars = starsMap[item.id] ?? 0;
+                      const isUnlocked = unlockedMap[item.id] ?? false;
+                      const isCompleted = stars > 0;
+                      const isFirstIncompleteUnlocked = isUnlocked && !isCompleted;
+                      const catMeta = GRAMMAR_CATEGORIES_METADATA.find((c) => c.key === item.category);
+
+                      return (
+                        <div
+                          key={item.id}
+                          className={`
+                            p-5 rounded-3xl bg-white border-2 flex flex-col justify-between gap-4 transition-all duration-200 relative
+                            ${
+                              isFirstIncompleteUnlocked
+                                ? 'border-duo-green shadow-card-lg ring-2 ring-emerald-400/20'
+                                : isCompleted
+                                ? 'border-surface-border hover:border-slate-300 shadow-card'
+                                : isUnlocked
+                                ? 'border-surface-border hover:border-sky-300 shadow-card'
+                                : 'border-slate-100 bg-slate-50/60 opacity-80'
+                            }
+                          `}
+                          id={`lesson-card-${item.id}`}
+                        >
+                          {/* Active Indicator Pin */}
+                          {isFirstIncompleteUnlocked && (
+                            <span className="absolute -top-3 left-6 px-3 py-0.5 rounded-full bg-duo-green text-white font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center gap-1 border-2 border-white">
+                              <span>Active</span>
+                              <span>🚀</span>
+                            </span>
+                          )}
+
+                          {/* Card Top: Badges & Stars */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-[11px] font-black px-2.5 py-1 rounded-xl bg-slate-100 text-ink-700 border border-slate-200">
+                                {item.sequenceOrder ? `#${item.sequenceOrder}` : 'Topic'}
+                              </span>
+                              <span className="text-[11px] font-black px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                {item.cefrLevel ? item.cefrLevel.replace('_PLUS', '+') : 'A1'}
+                              </span>
+                              {catMeta && (
+                                <span className="text-[11px] font-bold px-2 py-1 rounded-xl bg-slate-50 text-ink-500 border border-slate-200 hidden sm:inline-block">
+                                  {catMeta.icon} {lang === 'id' ? catMeta.name.id : catMeta.name.en}
+                                </span>
+                              )}
+                            </div>
+
+                            <div>
+                              <StarRating stars={stars} size="sm" animate={false} />
+                            </div>
+                          </div>
+
+                          {/* Card Body: Title, Description, Learning Flow */}
+                          <div className="flex flex-col gap-2">
+                            <h4 className="font-black text-base md:text-lg text-ink-900 leading-snug">
+                              {getTitle(item)}
+                            </h4>
+                            <p className="text-xs text-ink-500 font-semibold line-clamp-2 leading-relaxed">
+                              {lang === 'id' && item.description_id ? item.description_id : item.description}
+                            </p>
+
+                            {/* Clear Structured Learning Flow: Explain Topic -> Test Topic */}
+                            <div className="mt-1 p-2.5 rounded-2xl bg-surface-panel border border-surface-border flex items-center justify-between text-[11px] font-extrabold text-ink-600">
+                              <div className="flex items-center gap-1">
+                                <span>💡</span>
+                                <span>{lang === 'id' ? '1. Penjelasan Konsep' : '1. Concept & Rules'}</span>
+                              </div>
+                              <span className="text-slate-300">➔</span>
+                              <div className="flex items-center gap-1">
+                                <span>🎯</span>
+                                <span>{lang === 'id' ? '2. Latihan & Kuis' : '2. Practice & Quiz'}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Card Action Button */}
+                          <div>
+                            {isCompleted ? (
+                              <button
+                                onClick={() => handleNodeClick(item, true)}
+                                className="w-full py-2.5 px-4 rounded-xl2 bg-slate-100 hover:bg-slate-200 text-ink-700 font-black text-xs md:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-200"
+                              >
+                                <span>✓ {lang === 'id' ? 'Pelajari Ulang' : 'Review Topic'}</span>
+                                <span>🔁</span>
+                              </button>
+                            ) : isFirstIncompleteUnlocked ? (
+                              <button
+                                onClick={() => handleNodeClick(item, true)}
+                                className="w-full py-2.5 px-4 rounded-xl2 bg-duo-green hover:bg-duo-green-dark text-white font-black text-xs md:text-sm flex items-center justify-center gap-2 transition-all shadow-3d-green hover:scale-[1.01] cursor-pointer"
+                              >
+                                <span>{lang === 'id' ? 'Mulai Pelajari Topik' : 'Start Topic'}</span>
+                                <span>🚀</span>
+                              </button>
+                            ) : isUnlocked ? (
+                              <button
+                                onClick={() => handleNodeClick(item, true)}
+                                className="w-full py-2.5 px-4 rounded-xl2 bg-duo-blue hover:bg-duo-blue-dark text-white font-black text-xs md:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-3d-blue"
+                              >
+                                <span>{lang === 'id' ? 'Buka Topik' : 'Open Topic'}</span>
+                                <span>→</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleNodeClick(item, false)}
+                                className="w-full py-2.5 px-4 rounded-xl2 bg-slate-100 text-ink-400 font-bold text-xs md:text-sm flex items-center justify-center gap-2 cursor-not-allowed opacity-75 border border-slate-200"
+                              >
+                                <span>🔒 {lang === 'id' ? 'Terkunci' : 'Locked'}</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
               );
             })}
           </div>
