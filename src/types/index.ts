@@ -143,7 +143,7 @@ export type GrammarSubCategory =
   | 'toefl_structure'
   | 'toeic_business';
 
-export type QuestionType = 'jumble' | 'multiple_choice' | 'fill_in_blank';
+export type QuestionType = 'jumble' | 'multiple_choice' | 'fill_in_blank' | 'spot_the_mistake';
 
 export interface User {
   id: string;
@@ -194,9 +194,13 @@ export interface Question {
   prompt_id?: string;
   options?: string[];
   jumbledOptions?: string[];
-  correctAnswer: string | string[]; // string for MC & Fill-in-blank, string[] for Jumble
+  distractors?: string[]; // Extra distractor words in bank to prevent predictable elimination
+  correctAnswer: string | string[]; // string for MC/FIB/Mistake, string[] for Jumble
   correct_word_order?: string[];
   jumbled_word_order?: string[];
+  sentence_words?: string[]; // For spot_the_mistake: tokens of the target sentence
+  mistake_index?: number;    // Index of the erroneous word
+  correction?: string;       // Correct word replacement
   explanation: QuestionExplanation;
   explanation_id?: string | null;
   display_order?: number;

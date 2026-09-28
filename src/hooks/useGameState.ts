@@ -29,8 +29,10 @@ function buildWordItems(words: string[], zone: 'bank' | 'ans'): WordItem[] {
 function initQuestionState(question?: Question) {
   if (!question) return { bankItems: [], answerItems: [] };
   if (question.type === 'jumble' || (!question.type && question.jumbled_word_order)) {
-    const words = question.jumbled_word_order || question.correct_word_order || [];
-    const shuffled = [...words].sort(() => Math.random() - 0.5);
+    const baseWords = question.jumbled_word_order || question.correct_word_order || [];
+    const distractors = question.distractors || [];
+    const allWords = [...baseWords, ...distractors];
+    const shuffled = [...allWords].sort(() => Math.random() - 0.5);
     return {
       bankItems: buildWordItems(shuffled, 'bank'),
       answerItems: [],

@@ -35,6 +35,7 @@ import { AnswerZone } from './AnswerZone';
 import { WordBlock } from './WordBlock';
 import { MultipleChoiceQuestion } from './MultipleChoiceQuestion';
 import { FillInBlankQuestion } from './FillInBlankQuestion';
+import { SpotTheMistakeQuestion } from './SpotTheMistakeQuestion';
 import { FeedbackOverlay } from './FeedbackOverlay';
 import { OutOfHeartsModal } from './OutOfHeartsModal';
 import { WinModal } from './WinModal';
@@ -149,7 +150,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
 
     let isCorrect = false;
 
-    if (currentQ.type === 'multiple_choice') {
+    if (currentQ.type === 'multiple_choice' || currentQ.type === 'spot_the_mistake') {
       if (!state.mcSelected) return;
       isCorrect = state.mcSelected.trim().toLowerCase() === String(currentQ.correctAnswer).trim().toLowerCase();
     } else if (currentQ.type === 'fill_in_blank') {
@@ -223,6 +224,10 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
 
   const getRevealedCorrectAnswerText = (): string => {
     if (!currentQ) return '';
+    if (currentQ.type === 'spot_the_mistake') {
+      const correction = currentQ.correction ? ` (Correction: ${currentQ.correction})` : '';
+      return `${String(currentQ.correctAnswer)}${correction}`;
+    }
     if (Array.isArray(currentQ.correctAnswer)) {
       return currentQ.correctAnswer.join(' ');
     }
@@ -234,10 +239,10 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
 
   const canSubmit = (): boolean => {
     if (state.phase !== 'PLAYING' || !currentQ) return false;
-    if (currentQ.type === 'multiple_choice') return !!state.mcSelected;
+    if (currentQ.type === 'multiple_choice' || currentQ.type === 'spot_the_mistake') return !!state.mcSelected;
     if (currentQ.type === 'fill_in_blank') return !!state.fibSelected;
-    const expectedLength = (currentQ.correct_word_order || currentQ.correctAnswer)?.length ?? 0;
-    return state.answerItems.length > 0 && state.answerItems.length === expectedLength;
+    // Jumble: user can submit as long as at least 1 word has been arranged
+    return state.answerItems.length > 0;
   };
 
   if (!currentQ) {
@@ -321,6 +326,15 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
                 options={currentQ.options || []}
                 selectedAnswer={state.fibSelected}
                 onSelect={actions.selectFIB}
+                disabled={state.phase !== 'PLAYING'}
+              />
+            ) : currentQ.type === 'spot_the_mistake' ? (
+              <SpotTheMistakeQuestion
+                prompt={promptText}
+                sentenceWords={currentQ.sentence_words || (Array.isArray(currentQ.options) ? currentQ.options : [])}
+                options={currentQ.options}
+                selectedWord={state.mcSelected}
+                onSelect={actions.selectMC}
                 disabled={state.phase !== 'PLAYING'}
               />
             ) : (
