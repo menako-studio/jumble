@@ -190,8 +190,10 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
   useEffect(() => {
     if (state.phase === 'COMPLETED') {
       const starResult = calculateStars(state.mistakesCount, state.questions.length);
-      fireWin();
-      playWin();
+      if (starResult.stars > 0) {
+        fireWin();
+        playWin();
+      }
       const targetLessonId = lessonId || currentQ?.lesson_id || 'lesson-1';
       saveProgress(user.id, targetLessonId, starResult.stars);
       addUserPoints(user.id, state.score, starResult.stars);

@@ -28,8 +28,11 @@ export const WinModal: React.FC<WinModalProps> = ({
   onPlayAgain,
   onBackToLessons,
 }) => {
-  const { t } = useTranslation();
-  const msg = t(`ui.${messageKey[stars] ?? 'good'}`);
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'en' | 'id';
+  const defaultMsg = stars === 0
+    ? (lang === 'id' ? 'Belum berhasil mendapatkan bintang. Jangan menyerah, coba lagi!' : 'No stars earned yet. Keep practicing and try again!')
+    : t(`ui.${messageKey[stars] ?? 'good'}`);
 
   return (
     <div className="modal-overlay" id="win-modal">
@@ -60,14 +63,14 @@ export const WinModal: React.FC<WinModalProps> = ({
         className="bg-white rounded-xl4 p-8 w-full max-w-sm relative z-10 text-center shadow-card-lg border-2 border-slate-100"
         id="win-modal-content"
       >
-        {/* Trophy */}
+        {/* Trophy or Encouragement Icon */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
           className="text-7xl mb-4 leading-none"
         >
-          🏆
+          {stars > 0 ? '🏆' : '💪'}
         </motion.div>
 
         {/* Title */}
@@ -77,7 +80,9 @@ export const WinModal: React.FC<WinModalProps> = ({
           transition={{ delay: 0.2 }}
           className="text-3xl font-black text-ink-900 mb-1"
         >
-          {t('ui.levelclear')}
+          {stars > 0
+            ? t('ui.levelclear')
+            : (lang === 'id' ? 'Perlu Latihan Lagi!' : 'Needs Practice!')}
         </motion.h2>
 
         {/* Stars */}
@@ -92,7 +97,7 @@ export const WinModal: React.FC<WinModalProps> = ({
           transition={{ delay: 0.5 }}
           className="text-ink-500 font-semibold text-base mb-4"
         >
-          {msg}
+          {defaultMsg}
         </motion.p>
 
         {/* Score */}
@@ -119,7 +124,7 @@ export const WinModal: React.FC<WinModalProps> = ({
           className="flex flex-col gap-3"
         >
           <Button variant="success" onClick={onPlayAgain} id="play-again-btn">
-            🔁 {t('ui.playAgain')}
+            🔁 {stars === 0 ? (lang === 'id' ? 'Coba Lagi' : 'Try Again') : t('ui.playAgain')}
           </Button>
           <Button variant="ghost" onClick={onBackToLessons} id="back-to-lessons-btn">
             {t('ui.backToLessons')}

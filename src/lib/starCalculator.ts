@@ -19,16 +19,29 @@ export function calculateStars(
   totalQuestions: number = 5
 ): StarResult {
   if (totalQuestions <= 0) {
-    return { stars: 1, isPerfect: false, message: 'good' };
+    return { stars: 0, isPerfect: false, message: 'gameover' };
   }
 
+  // Perfect run: 0 mistakes
   if (mistakesMade === 0) {
     return { stars: 3, isPerfect: true, message: 'perfect' };
   }
-  if (mistakesMade <= 2) {
+
+  // Error rate calculation
+  const errorRate = mistakesMade / totalQuestions;
+
+  // Great performance: at most 1 mistake on short lessons, or <= 35% error rate on longer lessons
+  if ((mistakesMade === 1 && totalQuestions >= 2) || (errorRate <= 0.35 && mistakesMade < totalQuestions)) {
     return { stars: 2, isPerfect: false, message: 'great' };
   }
-  return { stars: 1, isPerfect: false, message: 'good' };
+
+  // Good performance: passed with some mistakes (< 75% error rate and not all questions wrong)
+  if (errorRate < 0.75 && mistakesMade < totalQuestions) {
+    return { stars: 1, isPerfect: false, message: 'good' };
+  }
+
+  // Failed / Salah total: 0 stars awarded
+  return { stars: 0, isPerfect: false, message: 'gameover' };
 }
 
 /**
