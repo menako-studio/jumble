@@ -20,8 +20,7 @@ export const SpotTheMistakeQuestion: React.FC<SpotTheMistakeQuestionProps> = ({
   onSelect,
   disabled = false,
 }) => {
-  const { i18n } = useTranslation();
-  const lang = i18n.language as 'en' | 'id';
+  const { t } = useTranslation();
 
   // Words to display for interactive selection
   const wordsToDisplay = sentenceWords.length > 0 ? sentenceWords : options;
@@ -33,25 +32,23 @@ export const SpotTheMistakeQuestion: React.FC<SpotTheMistakeQuestionProps> = ({
       <div className="bg-white rounded-xl3 p-6 border-2 border-b-4 border-surface-border shadow-card text-center relative overflow-hidden">
         <div className="flex items-center justify-between mb-3">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-black uppercase tracking-wider">
-            <span>🔍</span>
-            <span>{lang === 'id' ? 'Temukan Kesalahan' : 'Spot the Error'}</span>
+            <span aria-hidden="true">🔍</span>
+            <span>{t('game.spotLabel')}</span>
           </span>
           {sentenceFullText && (
             <AudioButton text={sentenceFullText} size="sm" variant="glass" />
           )}
         </div>
 
-        <h3 className="text-ink-900 font-black text-lg md:text-xl leading-snug mb-2">
-          {prompt || (lang === 'id' ? 'Pilih kata yang salah secara tata bahasa dalam kalimat berikut:' : 'Select the word that contains a grammatical error:')}
-        </h3>
-        <p className="text-xs text-ink-400 font-bold">
-          {lang === 'id' ? 'Klik atau sentuh kata yang salah' : 'Tap the word you believe is incorrect'}
-        </p>
+        <h2 id="spot-prompt" className="text-ink-900 font-black text-lg md:text-xl leading-snug mb-2">
+          {prompt || t('game.spotPrompt')}
+        </h2>
+        <p className="text-xs text-ink-500 font-bold">{t('game.spotHint')}</p>
       </div>
 
       {/* Interactive Sentence Word Tokens Area */}
       <div className="bg-surface-panel rounded-xl3 p-5 md:p-6 border-2 border-surface-border shadow-sm">
-        <div className="flex flex-wrap items-center justify-center gap-2.5 md:gap-3.5">
+        <div role="group" aria-labelledby="spot-prompt" className="flex flex-wrap items-center justify-center gap-2.5 md:gap-3.5">
           {wordsToDisplay.map((word, idx) => {
             // Clean token for checking
             const isSelected = selectedWord === word;
@@ -59,12 +56,14 @@ export const SpotTheMistakeQuestion: React.FC<SpotTheMistakeQuestionProps> = ({
             return (
               <motion.button
                 key={`${word}-${idx}`}
+                type="button"
+                aria-pressed={isSelected}
                 whileHover={!disabled ? { scale: 1.05 } : {}}
                 whileTap={!disabled ? { scale: 0.96 } : {}}
                 onClick={() => !disabled && onSelect(word)}
                 disabled={disabled}
                 className={`
-                  px-4 py-2.5 md:px-5 md:py-3 rounded-2xl font-black text-base md:text-lg transition-all duration-150 border-2 border-b-4
+                  min-h-12 px-4 py-2.5 md:px-5 md:py-3 rounded-2xl font-black text-base md:text-lg transition-[background-color,border-color,box-shadow] duration-150 border-2 border-b-4
                   ${
                     isSelected
                       ? 'bg-amber-100 border-amber-500 text-amber-950 shadow-md scale-105 ring-2 ring-amber-400/50'
@@ -82,11 +81,12 @@ export const SpotTheMistakeQuestion: React.FC<SpotTheMistakeQuestionProps> = ({
 
         {selectedWord && (
           <motion.div
+            role="status"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 text-center text-xs font-bold text-amber-700 bg-amber-50 py-1.5 px-3 rounded-xl border border-amber-200 inline-block mx-auto w-full"
+            className="mt-4 text-center text-xs font-bold text-amber-800 bg-amber-50 py-1.5 px-3 rounded-xl border border-amber-200 inline-block mx-auto w-full"
           >
-            {lang === 'id' ? 'Kata yang dipilih:' : 'Selected word:'} <span className="font-black text-amber-950 underline decoration-amber-500 underline-offset-2">"{selectedWord}"</span>
+            {t('game.selectedWord')} <span className="font-black text-amber-950 underline decoration-amber-500 underline-offset-2">"{selectedWord}"</span>
           </motion.div>
         )}
       </div>

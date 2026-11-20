@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900;1000&family=Outfit:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900;1000&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -25,10 +25,31 @@
     scroll-behavior: smooth;
   }
 
+  /* Visible keyboard focus everywhere (WCAG 2.4.7) — mouse clicks stay clean */
+  :focus-visible {
+    outline: 3px solid #1cb0f6;
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
   }
+}
+
+/* ============================================================
+   Brand gradient text — single source (was duplicated inline)
+   ============================================================ */
+.text-gradient-brand {
+  background: linear-gradient(135deg, #58cc02, #1cb0f6, #ce82ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* ============================================================
@@ -60,7 +81,7 @@
 }
 
 .duo-card {
-  @apply rounded-3xl bg-white border-2 border-b-4 border-surface-border p-5 transition-all duration-200;
+  @apply rounded-3xl bg-white border-2 border-b-4 border-surface-border p-5 transition-[transform,box-shadow,border-color] duration-200;
 }
 
 .duo-card:hover {
@@ -73,7 +94,7 @@
    ============================================================ */
 .word-block {
   @apply inline-flex items-center justify-center px-4 py-3 rounded-2xl font-extrabold text-lg
-         cursor-grab select-none transition-all duration-150
+         cursor-grab select-none transition-[transform,background-color,border-color,color,box-shadow] duration-150
          bg-white text-ink-900 border-2 border-b-4 border-slate-200;
   touch-action: none;
 }
@@ -85,11 +106,11 @@
 }
 
 .word-block--bank:hover {
-  @apply bg-sky-50 border-duo-blue-light text-duo-blue-dark;
+  @apply bg-sky-50 border-duo-blue-light text-sky-800;
 }
 
 .word-block--answer {
-  @apply bg-sky-50 text-duo-blue-dark border-duo-blue-light;
+  @apply bg-sky-50 text-sky-800 border-duo-blue-light;
 }
 
 .word-block--answer:hover {
@@ -101,7 +122,7 @@
 }
 
 .word-block--overlay {
-  @apply bg-white text-duo-blue-dark border-2 border-b-4 border-duo-blue;
+  @apply bg-white text-sky-800 border-2 border-b-4 border-duo-blue;
   box-shadow: 0 10px 24px rgba(28, 176, 246, 0.25);
   transform: scale(1.08) rotate(-1.5deg);
   cursor: grabbing;
@@ -124,7 +145,9 @@
    ============================================================ */
 .btn {
   @apply inline-flex items-center justify-center gap-2 rounded-2xl font-black uppercase tracking-wide
-         transition-all duration-100 select-none cursor-pointer border-2 border-b-4;
+         transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-100 select-none cursor-pointer border-2 border-b-4
+         disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+  min-height: 44px;
 }
 
 .btn:active {
@@ -148,6 +171,10 @@
   @apply btn bg-duo-yellow border-duo-yellow-shadow hover:bg-duo-yellow-dark text-amber-950 px-8 py-3.5 text-lg;
 }
 
+.btn-secondary {
+  @apply btn bg-white border-slate-300 hover:bg-slate-50 text-ink-700 px-8 py-3.5 text-lg;
+}
+
 .btn-sm {
   @apply px-4 py-2 text-sm rounded-xl border-b-[3px];
 }
@@ -169,7 +196,7 @@
 }
 
 .progress-fill {
-  @apply h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden;
+  @apply h-full rounded-full transition-[width] duration-500 ease-out relative overflow-hidden;
   background: linear-gradient(90deg, #58cc02, #79db28);
 }
 
@@ -235,6 +262,28 @@
 
 .star-reveal {
   animation: star-reveal 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Skeleton loading placeholder */
+.skeleton {
+  @apply relative overflow-hidden rounded-xl bg-slate-200/70;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Respect users who prefer reduced motion (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Hide scrollbars for slick pills */

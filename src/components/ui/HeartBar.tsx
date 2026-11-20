@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface HeartBarProps {
   lives: number;
@@ -11,8 +12,13 @@ interface HeartBarProps {
 }
 
 export const HeartBar: React.FC<HeartBarProps> = ({ lives, maxLives = 3 }) => {
+  const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-1.5" aria-label={`Lives: ${lives}`}>
+    <div
+      className="flex items-center gap-1.5"
+      role="img"
+      aria-label={t('ui.livesRemaining', { count: lives, max: maxLives })}
+    >
       <AnimatePresence>
         {Array.from({ length: maxLives }, (_, i) => {
           const filled = i < lives;
@@ -27,7 +33,6 @@ export const HeartBar: React.FC<HeartBarProps> = ({ lives, maxLives = 3 }) => {
               }
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               className="text-2xl leading-none"
-              role="img"
               aria-hidden="true"
             >
               {filled ? '❤️' : '🖤'}

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Modal } from '../ui/Modal';
+import { IconButton } from '../ui/IconButton';
 import { getGroqApiKey, setGroqApiKey, askGroqTutor } from '../../lib/groqClient';
 
 interface AITutorModalProps {
@@ -27,17 +29,14 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
   ruleExplanation,
   examples,
 }) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = (i18n.language as 'en' | 'id') || 'en';
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome-1',
       sender: 'ai',
-      text:
-        lang === 'id'
-          ? `👋 **Halo! Saya AI Grammar Tutor.** Ada yang bingung tentang **${lessonTitle}** sebelum masuk ke latihan? Tanyakan apa saja!`
-          : `👋 **Hi! I am your AI Grammar Tutor.** Have questions about **${lessonTitle}** before starting the challenge? Ask me anything!`,
+      text: t('tutor.welcome', { title: lessonTitle }),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -48,24 +47,25 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
   const [apiKeyInput, setApiKeyInput] = useState(getGroqApiKey());
   const [apiKeySaved, setApiKeySaved] = useState(false);
 
-  const quickPrompts = [
-    {
-      label: lang === 'id' ? '💡 Penjelasan Sederhana' : '💡 Simple Explanation',
-      prompt: lang === 'id' ? 'Tolong jelaskan aturan ini dengan cara yang sangat sederhana.' : 'Explain this rule in simple terms.',
-    },
-    {
-      label: lang === 'id' ? '📝 3 Contoh Tambahan' : '📝 3 More Examples',
-      prompt: lang === 'id' ? 'Berikan 3 contoh kalimat lainnya dalam kehidupan sehari-hari.' : 'Give me 3 more real-life example sentences.',
-    },
-    {
-      label: lang === 'id' ? '❓ Kapan Digunakan?' : '❓ When to Use?',
-      prompt: lang === 'id' ? 'Kapan situasi paling tepat untuk menggunakan rumus ini?' : 'When is the best situation to use this structure?',
-    },
-    {
-      label: lang === 'id' ? '🇮🇩 Bahasa Indonesia' : '🇮🇩 In Indonesian',
-      prompt: 'Jelaskan materi ini dalam Bahasa Indonesia secara singkat.',
-    },
-  ];
+  const quickPrompts = [1, 2, 3, 4].map((n) => ({
+    label: t(`tutor.qp${n}Label`),
+    prompt: t(`tutor.qp${n}`),
+  }));
+
+  const endRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: 'end', behavior: 'auto' });
+  }, [messages, isLoading]);
+
+  /** Renders **bold** markers from the tutor's replies instead of showing raw asterisks. */
+  const renderInline = (text: string) =>
+    text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+      part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
+        <strong key={i}>{part.slice(2, -2)}</strong>
+      ) : (
+        <React.Fragment key={i}>{part}</React.Fragment>
+      ),
+    );
 
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || inputQuery;
@@ -102,6 +102,15 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
       setMessages((prev) => [...prev, aiMsg]);
     } catch (e) {
       console.error(e);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `err-${Date.now()}`,
+          sender: 'ai',
+          text: t('tutor.error'),
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -114,162 +123,165 @@ export const AITutorModal: React.FC<AITutorModalProps> = ({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/45 backdrop-blur-md font-nunito">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 20 }}
-            className="w-full max-w-lg bg-white border-2 border-surface-border rounded-3xl shadow-card-lg overflow-hidden flex flex-col h-[600px] max-h-[85vh] relative"
-            id="ai-tutor-modal"
-          >
-            {/* Modal Header */}
-            <div className="p-4 bg-gradient-to-r from-sky-50 via-indigo-50 to-emerald-50 border-b border-surface-border flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-duo-blue text-white flex items-center justify-center text-xl font-black shadow-glow">
-                  ⚡
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-ink-900 font-black text-base">Groq AI Grammar Tutor</h3>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-duo-green text-white uppercase tracking-wide">
-                      LLM
-                    </span>
-                  </div>
-                  <p className="text-ink-500 text-xs truncate max-w-[200px]">
-                    {lessonTitle}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-ink-700 text-xs font-bold transition-all cursor-pointer"
-                  title="Groq API Settings"
-                  id="groq-settings-btn"
-                >
-                  ⚙️ Key
-                </button>
-                <button
-                  onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-ink-700 font-bold flex items-center justify-center transition-all cursor-pointer"
-                  id="close-ai-tutor-btn"
-                >
-                  ✕
-                </button>
-              </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      label={t('tutor.label')}
+      showCloseButton={false}
+      className="max-w-lg p-0 overflow-hidden flex flex-col h-[600px] max-h-[85dvh]"
+    >
+      <div id="ai-tutor-modal" className="flex flex-col h-full min-h-0">
+        {/* Header */}
+        <div className="p-4 bg-gradient-to-r from-sky-50 via-indigo-50 to-emerald-50 border-b border-surface-border flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div aria-hidden="true" className="w-10 h-10 rounded-2xl bg-sky-700 text-white flex items-center justify-center text-xl shadow-glow shrink-0">
+              ⚡
             </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h2 className="text-ink-900 font-black text-base">Groq AI Grammar Tutor</h2>
+                <span className="px-2 py-0.5 rounded-full text-xs font-black bg-green-700 text-white uppercase tracking-wide">
+                  LLM
+                </span>
+              </div>
+              <p className="text-ink-500 text-xs truncate">{lessonTitle}</p>
+            </div>
+          </div>
 
-            {/* Groq API Key Settings Overlay */}
-            {showSettings && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="p-4 bg-surface-panel border-b border-surface-border flex flex-col gap-2 shrink-0"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-ink-900">Groq API Key (Optional)</span>
-                  {apiKeySaved && (
-                    <span className="text-[10px] text-emerald-600 font-bold">Saved!</span>
-                  )}
-                </div>
-                <p className="text-[11px] text-ink-500">
-                  Enter your Groq API Key (<code className="text-duo-orange-dark">gsk_...</code>) for live Llama-3.3-70b AI answers. Leave empty for instant pre-built fallbacks.
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="password"
-                    value={apiKeyInput}
-                    onChange={(e) => setApiKeyInput(e.target.value)}
-                    placeholder="gsk_..."
-                    className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-ink-900 text-xs focus:outline-none focus:border-duo-blue"
-                  />
-                  <button
-                    onClick={handleSaveApiKey}
-                    className="px-3 py-1.5 rounded-xl bg-duo-blue text-white font-bold text-xs hover:bg-duo-blue-dark cursor-pointer"
-                  >
-                    Save
-                  </button>
-                </div>
-              </motion.div>
-            )}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowSettings(!showSettings)}
+              aria-expanded={showSettings}
+              aria-controls="groq-settings-panel"
+              aria-label={t('tutor.settings')}
+              title={t('tutor.settings')}
+              className="px-3 min-h-11 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-ink-700 text-xs font-bold transition-colors cursor-pointer"
+              id="groq-settings-btn"
+            >
+              {t('tutor.keyButton')}
+            </button>
+            <IconButton label={t('ui.close')} onClick={onClose} className="bg-white border border-slate-200" id="close-ai-tutor-btn">
+              <X className="w-5 h-5" aria-hidden="true" />
+            </IconButton>
+          </div>
+        </div>
 
-            {/* Messages Body */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 no-scrollbar bg-surface-canvas">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${
-                    msg.sender === 'user' ? 'items-end' : 'items-start'
-                  }`}
-                >
-                  <div
-                    className={`max-w-[85%] p-3.5 rounded-2xl text-xs md:text-sm font-medium leading-relaxed shadow-sm ${
-                      msg.sender === 'user'
-                        ? 'bg-duo-blue text-white rounded-br-none'
-                        : 'bg-white text-ink-900 border border-surface-border rounded-bl-none'
-                    }`}
-                  >
-                    <div className="whitespace-pre-wrap">{msg.text}</div>
-                  </div>
-                  <span className="text-[9px] text-ink-400 mt-1 px-1">{msg.timestamp}</span>
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="flex items-center gap-2 text-xs text-ink-500 p-2 animate-pulse">
-                  <span className="text-base">⚡</span>
-                  <span>Groq AI is thinking...</span>
-                </div>
+        {/* API key settings */}
+        {showSettings && (
+          <div id="groq-settings-panel" className="p-4 bg-surface-panel border-b border-surface-border flex flex-col gap-2 shrink-0">
+            <div className="flex items-center justify-between">
+              <label htmlFor="groq-key-input" className="text-xs font-black text-ink-900">
+                {t('tutor.keyTitle')}
+              </label>
+              {apiKeySaved && (
+                <span role="status" className="text-xs text-emerald-800 font-bold">
+                  {t('tutor.saved')}
+                </span>
               )}
             </div>
-
-            {/* Quick Prompts */}
-            <div className="p-2 border-t border-surface-border bg-white flex gap-2 overflow-x-auto no-scrollbar shrink-0">
-              {quickPrompts.map((qp, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSend(qp.prompt)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-ink-700 border border-slate-200 text-[11px] font-bold shrink-0 transition-all cursor-pointer"
-                >
-                  {qp.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Input Bar */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSend();
-              }}
-              className="p-3 bg-white border-t border-surface-border flex items-center gap-2 shrink-0"
-            >
+            <p className="text-xs text-ink-500">{t('tutor.keyHelp')}</p>
+            <div className="flex gap-2">
               <input
-                type="text"
-                value={inputQuery}
-                onChange={(e) => setInputQuery(e.target.value)}
-                placeholder={
-                  lang === 'id' ? 'Tanyakan tentang materi ini...' : 'Ask anything about this lesson...'
-                }
-                className="flex-1 px-4 py-2.5 rounded-2xl bg-surface-panel border border-slate-200 text-ink-900 text-xs md:text-sm focus:outline-none focus:border-duo-blue placeholder:text-ink-400"
-                id="ai-tutor-input"
+                id="groq-key-input"
+                type="password"
+                autoComplete="off"
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+                placeholder="gsk_..."
+                className="flex-1 min-h-11 px-3 rounded-xl bg-white border border-slate-300 text-ink-900 text-sm focus:outline-none focus:border-duo-blue"
               />
               <button
-                type="submit"
-                disabled={!inputQuery.trim() || isLoading}
-                className="w-10 h-10 rounded-2xl bg-duo-green hover:bg-duo-green-dark disabled:opacity-40 text-white font-black flex items-center justify-center transition-all cursor-pointer shadow-md"
-                id="ai-tutor-send-btn"
+                type="button"
+                onClick={handleSaveApiKey}
+                className="px-4 min-h-11 rounded-xl bg-sky-700 text-white font-bold text-sm hover:bg-sky-800 cursor-pointer transition-colors"
               >
-                ➔
+                {t('tutor.save')}
               </button>
-            </form>
-          </motion.div>
+            </div>
+          </div>
+        )}
+
+        {/* Conversation */}
+        <div
+          role="log"
+          aria-live="polite"
+          aria-label={t('tutor.messages')}
+          className="flex-1 min-h-0 p-4 overflow-y-auto space-y-3 no-scrollbar bg-surface-canvas"
+        >
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+              <div
+                className={`max-w-[85%] p-3.5 rounded-2xl text-sm font-medium leading-relaxed shadow-sm ${
+                  msg.sender === 'user'
+                    ? 'bg-sky-700 text-white rounded-br-none'
+                    : 'bg-white text-ink-900 border border-surface-border rounded-bl-none'
+                }`}
+              >
+                <div className="whitespace-pre-wrap">{renderInline(msg.text)}</div>
+              </div>
+              <span className="text-xs text-ink-500 mt-1 px-1">{msg.timestamp}</span>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div role="status" className="flex items-center gap-2 text-sm text-ink-500 p-2 animate-pulse">
+              <span className="text-base" aria-hidden="true">⚡</span>
+              <span>{t('tutor.thinking')}</span>
+            </div>
+          )}
+          <div ref={endRef} />
         </div>
-      )}
-    </AnimatePresence>
+
+        {/* Quick prompts */}
+        <div
+          role="group"
+          aria-label={t('tutor.quickPrompts')}
+          className="p-2 border-t border-surface-border bg-white flex gap-2 overflow-x-auto no-scrollbar shrink-0"
+        >
+          {quickPrompts.map((qp, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSend(qp.prompt)}
+              disabled={isLoading}
+              className="px-3 min-h-11 rounded-xl bg-slate-50 hover:bg-slate-100 text-ink-700 border border-slate-200 text-xs font-bold shrink-0 transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {qp.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Input */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+          className="p-3 bg-white border-t border-surface-border flex items-center gap-2 shrink-0"
+        >
+          <input
+            type="text"
+            value={inputQuery}
+            onChange={(e) => setInputQuery(e.target.value)}
+            placeholder={t('tutor.placeholder')}
+            aria-label={t('tutor.placeholder')}
+            data-autofocus
+            className="flex-1 min-h-11 px-4 rounded-2xl bg-surface-panel border border-slate-200 text-ink-900 text-sm focus:outline-none focus:border-duo-blue placeholder:text-ink-500"
+            id="ai-tutor-input"
+          />
+          <button
+            type="submit"
+            disabled={!inputQuery.trim() || isLoading}
+            aria-label={t('tutor.send')}
+            title={t('tutor.send')}
+            className="w-11 h-11 rounded-2xl bg-green-700 hover:bg-green-800 disabled:opacity-40 text-white font-black flex items-center justify-center transition-colors cursor-pointer shadow-md"
+            id="ai-tutor-send-btn"
+          >
+            <span aria-hidden="true">➔</span>
+          </button>
+        </form>
+      </div>
+    </Modal>
   );
 };

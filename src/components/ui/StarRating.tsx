@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface StarRatingProps {
   stars: number;     // 0–3
@@ -16,6 +17,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
   size = 'lg',
   animate = true,
 }) => {
+  const { t } = useTranslation();
   const [revealed, setRevealed] = useState(!animate);
 
   useEffect(() => {
@@ -29,12 +31,17 @@ export const StarRating: React.FC<StarRatingProps> = ({
   const starSize = size === 'lg' ? 'text-6xl' : 'text-3xl';
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div
+      className="flex items-center justify-center gap-2"
+      role="img"
+      aria-label={t('ui.starsEarned', { count: stars })}
+    >
       {[0, 1, 2].map((i) => {
         const filled = i < stars;
         return (
           <motion.span
             key={i}
+            aria-hidden="true"
             className={`${starSize} leading-none`}
             initial={animate ? { scale: 0, rotate: -30 } : false}
             animate={revealed ? { scale: 1, rotate: 0 } : {}}

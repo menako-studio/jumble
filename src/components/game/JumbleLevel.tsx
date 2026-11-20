@@ -247,7 +247,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
 
   if (!currentQ) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-jumble">
+      <div className="flex items-center justify-center min-h-dvh bg-jumble" role="status">
         <p className="text-ink-500 font-black animate-pulse">{t('ui.loading', 'Loading questions...')}</p>
       </div>
     );
@@ -280,7 +280,7 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
       <div className="bg-jumble min-h-dvh flex flex-col font-nunito relative">
         {/* Card Header */}
         <CardHeader
-          title={state.isReviewMode ? '❤️ Review Practice (+1 Heart)' : lessonName}
+          title={state.isReviewMode ? `❤️ ${t('game.reviewTitle')}` : lessonName}
           cefrLevel={cefrLevel}
           currentIndex={state.currentIndex}
           totalQuestions={state.questions.length}
@@ -299,13 +299,13 @@ export const JumbleLevel: React.FC<JumbleLevelProps> = ({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <span className="text-duo-yellow-dark text-lg">⚡</span>
-              <span className="text-amber-700 font-black text-sm">{state.score.toLocaleString()} XP</span>
+              <span className="text-lg" aria-hidden="true">⚡</span>
+              <span className="text-amber-800 font-black text-sm">{t('game.xp', { score: state.score.toLocaleString() })}</span>
             </motion.div>
 
             {state.isReviewMode && (
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 text-xs font-black">
-                Review Goal: {state.reviewCorrectCount}/5 Correct
+              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border-2 border-emerald-200 text-xs font-black">
+                {t('game.reviewGoal', { count: state.reviewCorrectCount })}
               </span>
             )}
           </div>

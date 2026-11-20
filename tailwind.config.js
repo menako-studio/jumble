@@ -6,7 +6,7 @@ export default {
   ],
   theme: {
     extend: {
-      // ——— Nunito & Outfit font ———
+      // ——— Nunito font ———
       fontFamily: {
         nunito: ['Nunito', 'sans-serif'],
       },
@@ -56,7 +56,7 @@ export default {
           mint:     '#d7ffb8',
           mintText: '#1a6000',
           coral:    '#ffdfe0',
-          coralText:'#ea2b2b',
+          coralText:'#b91c1c',
         },
         // Legacy Brand Palette
         brand: {
@@ -103,11 +103,13 @@ export default {
           border: '#e2e8f0',  // clean light divider/border
         },
         // ——— High-contrast slate ink typography ———
+        // 500 & 400 both pass WCAG AA (≥4.5:1) on white for text.
         ink: {
           900: '#0f172a',
           700: '#1e293b',
-          500: '#64748b',
-          400: '#94a3b8',
+          500: '#526077',
+          400: '#64748b',
+          300: '#94a3b8', // decorative only — fails text contrast
         },
       },
       // ——— Custom Animations ———
