@@ -2,6 +2,8 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuestions, useLessons } from '../hooks/useSupabase';
+import { SkeletonGroup, Skeleton } from '../components/ui/Skeleton';
+import { ErrorState } from '../components/ui/StateMessage';
 import { JumbleLevel } from '../components/game/JumbleLevel';
 import type { GrammarModule } from '../types';
 
@@ -24,11 +26,25 @@ export const PlayPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-jumble min-h-dvh flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4 animate-bounce">🧩</div>
-          <p className="text-ink-500 font-semibold animate-pulse">{t('ui.loading', 'Loading lesson...')}</p>
-        </div>
+      <div className="bg-jumble min-h-dvh flex flex-col">
+        <SkeletonGroup label={t('ui.loading', 'Loading lesson...')} className="w-full max-w-2xl mx-auto px-4 py-6 flex flex-col gap-8">
+          {/* Header placeholder: close, progress, hearts */}
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-11 h-11 rounded-full" />
+            <Skeleton className="h-3.5 flex-1 rounded-full" />
+            <Skeleton className="w-20 h-8 rounded-full" />
+          </div>
+          {/* Question card placeholder */}
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-6 w-2/3" />
+            <Skeleton className="h-24 w-full rounded-3xl" />
+            <div className="flex flex-wrap gap-3">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-12 w-24 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+        </SkeletonGroup>
       </div>
     );
   }
@@ -36,12 +52,14 @@ export const PlayPage: React.FC = () => {
   if (error || questions.length === 0) {
     return (
       <div className="bg-jumble min-h-dvh flex items-center justify-center px-4">
-        <div className="glass rounded-xl3 p-8 text-center max-w-sm">
-          <p className="text-4xl mb-4">😅</p>
-          <p className="text-ink-900 font-bold mb-4">{t('ui.errorLoading', 'Could not load questions.')}</p>
-          <button onClick={() => navigate('/lessons')} className="btn-primary btn btn-sm font-black cursor-pointer">
-            {t('ui.backToLessons', 'Back to Lessons')}
-          </button>
+        <div className="glass rounded-xl3 p-6 max-w-sm w-full">
+          <ErrorState
+            icon="😅"
+            title={t('ui.errorLoading', 'Could not load questions.')}
+            onRetry={() => navigate('/lessons')}
+            actionLabel={t('ui.backToLessons', 'Back to Lessons')}
+            className="py-4"
+          />
         </div>
       </div>
     );
@@ -55,9 +73,7 @@ export const PlayPage: React.FC = () => {
       lessonName={getLessonName(lesson)}
       cefrLevel={lesson?.cefrLevel}
       onExit={() => navigate('/lessons')}
-      onComplete={(_stars, _score) => {
-        navigate('/lessons');
-      }}
+      onComplete={() => navigate('/lessons')}
     />
   );
 };

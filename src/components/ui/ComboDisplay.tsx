@@ -28,9 +28,10 @@ export const ComboDisplay: React.FC<ComboDisplayProps> = ({ combo }) => {
         animate={{ scale: 1, rotate: 0, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+        role="status"
         className={`flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r ${color} text-white font-black text-sm shadow-lg`}
       >
-        <span className="text-base">🔥</span>
+        <span className="text-base" aria-hidden="true">🔥</span>
         <span>{combo}x {t('ui.combo')}</span>
       </motion.div>
     </AnimatePresence>

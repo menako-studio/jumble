@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { IconButton } from '../ui/IconButton';
 import { ProgressBar } from '../ui/ProgressBar';
 import { getHeartsState, getRemainingMsToNextHeart, MAX_HEARTS } from '../../lib/heartsManager';
 import { useSound } from '../../hooks/useSound';
@@ -27,6 +29,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   onExit,
   onOpenRefillModal,
 }) => {
+  const { t } = useTranslation();
   const [remainingMs, setRemainingMs] = useState(0);
   const { muted, toggleMute } = useSound();
 
@@ -41,7 +44,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   }, [heartsCount]);
 
   const formatTimer = (ms: number) => {
-    if (ms <= 0) return 'Full';
+    if (ms <= 0) return t('game.timerFull');
     const totalSecs = Math.floor(ms / 1000);
     const hours = Math.floor(totalSecs / 3600);
     const mins = Math.floor((totalSecs % 3600) / 60);
@@ -67,52 +70,55 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
       <div className="max-w-lg mx-auto px-4 py-3">
         {/* Row 1: Exit + Title & CEFR Badge + Hearts */}
         <div className="flex items-center gap-3 mb-2.5">
-          <button
+          <IconButton
+            label={t('game.exit')}
             onClick={onExit}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-ink-500 hover:text-ink-900 font-bold flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Exit lesson"
+            className="bg-slate-100"
             id="header-exit-btn"
           >
-            ✕
-          </button>
+            <X size={18} strokeWidth={2.5} aria-hidden="true" />
+          </IconButton>
 
           <div className="flex-1 min-w-0 flex items-center gap-2">
             {cefrLevel && (
-              <span className={`px-2 py-0.5 rounded-full text-xs font-black border uppercase tracking-wider ${getCefrBadgeStyle(cefrLevel)}`}>
+              <span className={`hidden sm:inline-block px-2 py-0.5 rounded-full text-xs font-black border uppercase tracking-wider ${getCefrBadgeStyle(cefrLevel)}`}>
                 {cefrLevel.replace('_PLUS', '+')}
               </span>
             )}
-            <h2 className="text-ink-900 font-black text-base truncate">{title}</h2>
+            <h1 className="text-ink-900 font-black text-sm sm:text-base leading-tight line-clamp-2">{title}</h1>
           </div>
 
           {/* Hearts Counter (Clickable to Refill) */}
           <button
+            type="button"
             onClick={onOpenRefillModal}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-panel border transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 min-h-11 rounded-full bg-surface-panel border transition-[border-color,transform] cursor-pointer ${
               canRefill
-                ? 'border-duo-red/50 hover:border-duo-red hover:scale-105 shadow-glow'
+                ? 'border-duo-red/50 hover:border-duo-red shadow-glow'
                 : 'border-surface-border'
             }`}
-            title={canRefill ? 'Click to refill hearts anytime!' : 'Hearts status'}
+            title={canRefill ? t('game.refillTip') : undefined}
+            aria-label={`${isProUser ? t('game.heartsPro') : t('game.heartsLabel', { count: heartsCount, max: MAX_HEARTS })}${canRefill ? `. ${t('game.refillTip')}` : ''}`}
             id="header-hearts-btn"
           >
             <motion.span
               animate={heartsCount > 0 ? { scale: [1, 1.25, 1] } : { scale: 1 }}
               transition={{ duration: 0.4 }}
               className="text-lg leading-none"
+              aria-hidden="true"
             >
               {isProUser ? '♾️' : '❤️'}
             </motion.span>
-            <span className="text-ink-900 font-black text-sm">
+            <span className="text-ink-900 font-black text-sm" aria-hidden="true">
               {isProUser ? 'PRO' : `${heartsCount}/${MAX_HEARTS}`}
             </span>
 
             {canRefill && (
-              <div className="flex items-center gap-1 ml-1">
-                <span className="text-[10px] bg-duo-red text-white px-1.5 py-0.5 rounded-full font-black animate-pulse">
-                  + Refill
+              <div className="flex items-center gap-1 ml-1" aria-hidden="true">
+                <span className="text-xs bg-red-700 text-white px-1.5 py-0.5 rounded-full font-black animate-pulse">
+                  {t('game.refill')}
                 </span>
-                <span className="text-[10px] text-ink-400 font-mono hidden sm:inline">
+                <span className="text-xs text-ink-500 font-mono hidden sm:inline">
                   ⏱ {formatTimer(remainingMs)}
                 </span>
               </div>
@@ -120,15 +126,15 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
           </button>
 
           {/* Mute / Audio Toggle */}
-          <button
+          <IconButton
+            label={muted ? t('game.unmute') : t('game.mute')}
+            aria-pressed={muted}
             onClick={toggleMute}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-ink-500 hover:text-ink-900 flex items-center justify-center transition-colors cursor-pointer"
-            aria-label={muted ? 'Unmute sound effects' : 'Mute sound effects'}
-            title={muted ? 'Unmute' : 'Mute'}
+            className="bg-slate-100"
             id="header-mute-btn"
           >
-            {muted ? <VolumeX size={16} strokeWidth={2.5} /> : <Volume2 size={16} strokeWidth={2.5} />}
-          </button>
+            {muted ? <VolumeX size={18} strokeWidth={2.5} aria-hidden="true" /> : <Volume2 size={18} strokeWidth={2.5} aria-hidden="true" />}
+          </IconButton>
         </div>
 
         {/* Row 2: Progress Bar */}
@@ -136,7 +142,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
           <div className="flex-1">
             <ProgressBar current={currentIndex} total={totalQuestions} />
           </div>
-          <span className="text-ink-400 text-xs font-bold font-mono">
+          <span className="text-ink-500 text-xs font-bold font-mono" aria-hidden="true">
             {currentIndex + 1}/{totalQuestions}
           </span>
         </div>

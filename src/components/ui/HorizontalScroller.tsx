@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface HorizontalScrollerProps {
   children: ReactNode;
@@ -6,6 +7,7 @@ interface HorizontalScrollerProps {
 }
 
 export const HorizontalScroller: React.FC<HorizontalScrollerProps> = ({ children, className = '' }) => {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -68,11 +70,12 @@ export const HorizontalScroller: React.FC<HorizontalScrollerProps> = ({ children
       {/* Left Arrow Button */}
       {canScrollLeft && (
         <button
+          type="button"
           onClick={() => scrollBy(-240)}
-          className="absolute left-0 z-20 w-8 h-8 rounded-full bg-white border-2 border-slate-200 hover:bg-slate-50 text-ink-700 flex items-center justify-center font-black text-sm shadow-card transition-all cursor-pointer -translate-x-1"
-          aria-label="Scroll left"
+          className="absolute left-0 z-20 w-11 h-11 rounded-full bg-white border-2 border-slate-200 hover:bg-slate-50 text-ink-700 flex items-center justify-center font-black text-sm shadow-card transition-colors cursor-pointer -translate-x-1"
+          aria-label={t('ui.scrollLeft')}
         >
-          ‹
+          <span aria-hidden="true">‹</span>
         </button>
       )}
 
@@ -105,11 +108,12 @@ export const HorizontalScroller: React.FC<HorizontalScrollerProps> = ({ children
       {/* Right Arrow Button */}
       {canScrollRight && (
         <button
+          type="button"
           onClick={() => scrollBy(240)}
-          className="absolute right-0 z-20 w-8 h-8 rounded-full bg-white border-2 border-slate-200 hover:bg-slate-50 text-ink-700 flex items-center justify-center font-black text-sm shadow-card transition-all cursor-pointer translate-x-1"
-          aria-label="Scroll right"
+          className="absolute right-0 z-20 w-11 h-11 rounded-full bg-white border-2 border-slate-200 hover:bg-slate-50 text-ink-700 flex items-center justify-center font-black text-sm shadow-card transition-colors cursor-pointer translate-x-1"
+          aria-label={t('ui.scrollRight')}
         >
-          ›
+          <span aria-hidden="true">›</span>
         </button>
       )}
     </div>

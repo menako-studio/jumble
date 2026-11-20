@@ -14,6 +14,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 export type WordBlockVariant = 'bank' | 'answer' | 'overlay' | 'correct' | 'incorrect';
 
@@ -35,6 +36,7 @@ export const SortableWordBlock: React.FC<WordBlockProps> = ({
   onClick,
   disabled,
 }) => {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -56,6 +58,15 @@ export const SortableWordBlock: React.FC<WordBlockProps> = ({
       {...attributes}
       {...listeners}
       onClick={onClick}
+      // Keyboard activation (Enter/Space) mirrors tap-to-move so tiles are usable without a pointer
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onClick && !disabled) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      aria-label={variant === 'bank' ? t('game.addWord', { word }) : t('game.removeWord', { word })}
+      aria-disabled={disabled || undefined}
       className={clsx(
         'word-block',
         variant === 'bank'      && 'word-block--bank',

@@ -7,6 +7,7 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { SortableWordBlock } from './WordBlock';
 
 interface WordBankProps {
@@ -16,13 +17,16 @@ interface WordBankProps {
 }
 
 export const WordBank: React.FC<WordBankProps> = ({ items, onWordClick, disabled }) => {
+  const { t } = useTranslation();
   const { setNodeRef, isOver } = useDroppable({ id: 'word-bank' });
 
   return (
     <div
       ref={setNodeRef}
+      role="group"
+      aria-label={t('game.wordBank')}
       className={clsx(
-        'min-h-[72px] w-full rounded-xl2 p-3 transition-all duration-200',
+        'min-h-[72px] w-full rounded-xl2 p-3 transition-colors duration-200',
         'flex flex-wrap gap-2 items-center justify-center',
         isOver
           ? 'bg-sky-50 ring-2 ring-duo-blue/40'

@@ -32,8 +32,10 @@ export const AnswerZone: React.FC<AnswerZoneProps> = ({
   return (
     <div
       ref={setNodeRef}
+      role="group"
+      aria-label={t('game.answerArea')}
       className={clsx(
-        'min-h-[80px] w-full rounded-xl3 p-4 transition-all duration-200',
+        'min-h-[80px] w-full rounded-xl3 p-4 transition-colors duration-200',
         'flex flex-wrap gap-2 items-center justify-center',
         'border-2 border-dashed',
         isOver
@@ -51,7 +53,7 @@ export const AnswerZone: React.FC<AnswerZoneProps> = ({
         strategy={horizontalListSortingStrategy}
       >
         {items.length === 0 ? (
-          <p className="text-slate-400 text-sm font-medium pointer-events-none select-none">
+          <p className="text-ink-500 text-sm font-medium pointer-events-none select-none">
             {t('ui.dragWords')}
           </p>
         ) : (
